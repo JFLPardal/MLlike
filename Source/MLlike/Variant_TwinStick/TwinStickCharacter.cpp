@@ -13,6 +13,7 @@
 #include "TwinStickProjectile.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "MLLikeAbilitySystemComponent.h"
 
 ATwinStickCharacter::ATwinStickCharacter()
 {
@@ -44,6 +45,8 @@ ATwinStickCharacter::ATwinStickCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+
+	ASC = CreateDefaultSubobject< UMLLikeAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 }
 
 void ATwinStickCharacter::BeginPlay()
@@ -52,6 +55,8 @@ void ATwinStickCharacter::BeginPlay()
 	
 	// update the items count
 	UpdateItems();
+
+	ASC->InitAbilityActorInfo(this, this);
 }
 
 void ATwinStickCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -121,7 +126,7 @@ void ATwinStickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(StickAimAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::StickAim);
 		EnhancedInputComponent->BindAction(MouseAimAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::MouseAim);
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Dash);
-		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Shoot);
+		//EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Shoot);
 		EnhancedInputComponent->BindAction(AoEAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::AoEAttack);
 
 	}

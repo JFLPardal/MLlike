@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "TwinStickCharacter.generated.h"
 
+class UMLLikeAbilitySystemComponent;
 class USpringArmComponent;
 class UCameraComponent;
 struct FInputActionValue;
@@ -120,6 +121,8 @@ protected:
 	/** Timer to handle stick autofire */
 	FTimerHandle AutoFireTimer;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
+	TObjectPtr<UMLLikeAbilitySystemComponent> ASC;
 public:
 	
 	/** Constructor */

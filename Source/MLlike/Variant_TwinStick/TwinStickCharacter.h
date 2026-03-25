@@ -17,6 +17,8 @@ class UInputAction;
 class ATwinStickAoEAttack;
 class ATwinStickProjectile;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShotFired, int32, RemainingAmmo);
+
 /**
  *  A player-controlled character for a Twin Stick Shooter game
  *  Automatically rotates to face the aim direction.
@@ -132,6 +134,8 @@ public:
 	/** Constructor */
 	ATwinStickCharacter();
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnShotFired OnShotFired;
 protected:
 
 	/** Gameplay Initialization */

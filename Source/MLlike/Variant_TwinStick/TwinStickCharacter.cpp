@@ -59,7 +59,18 @@ void ATwinStickCharacter::BeginPlay()
 	// update the items count
 	UpdateItems();
 
-	ASC->InitAbilityActorInfo(this, this);
+	if (IsValid(ASC))
+	{
+		ASC->InitAbilityActorInfo(this, this);
+	}
+
+	if (IsValid(ShootingAttributeSet))
+	{
+		ShootingAttributeSet->OnShotFired.BindLambda([this](int32 RemainingAmmo) 
+		{ 
+			OnShotFired.Broadcast(RemainingAmmo);
+		});
+	}
 }
 
 void ATwinStickCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)

@@ -6,6 +6,8 @@
 #include "AttributeSet.h"
 #include "ShootingAttributeSet.generated.h"
 
+DECLARE_DELEGATE_OneParam(FASOnShotFired, int32 /*RemainingAmmo*/);
+
 /**
  * 
  */
@@ -29,4 +31,6 @@ public:
 
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, Ammo);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxAmmo);
+
+	FASOnShotFired OnShotFired;
 };

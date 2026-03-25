@@ -27,9 +27,16 @@ void UShootingAttributeSet::PostAttributeChange(const FGameplayAttribute& Attrib
 		// out of ammo? 
 		if (UAbilitySystemComponent* const ASC = GetOwningAbilitySystemComponent(); IsValid(ASC))
 		{
+			const FName OutOfAmmoTagName("Abilities.Shoot.OutOfAmmo");
 			(NewValue == 0) ?
-				ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag("Abilities.Shoot.OutOfAmmo")) :
-				ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag("Abilities.Shoot.OutOfAmmo"));
+				ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(OutOfAmmoTagName)) :
+				ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(OutOfAmmoTagName));
+		}
+
+		if (const bool ShootFired = OldValue > NewValue)
+		{
+			OnShotFired.ExecuteIfBound(NewValue);
 		}
 	}
+
 }

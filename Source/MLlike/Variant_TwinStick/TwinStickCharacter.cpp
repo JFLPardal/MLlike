@@ -14,6 +14,7 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "MLLikeAbilitySystemComponent.h"
+#include "ShootingAttributeSet.h"
 
 ATwinStickCharacter::ATwinStickCharacter()
 {
@@ -47,6 +48,8 @@ ATwinStickCharacter::ATwinStickCharacter()
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
 	ASC = CreateDefaultSubobject< UMLLikeAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+
+	ShootingAttributeSet = CreateDefaultSubobject<UShootingAttributeSet>(TEXT("ShootingAttributeSet"));
 }
 
 void ATwinStickCharacter::BeginPlay()

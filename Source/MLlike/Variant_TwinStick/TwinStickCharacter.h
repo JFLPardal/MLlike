@@ -8,6 +8,7 @@
 #include "TwinStickCharacter.generated.h"
 
 class UMLLikeAbilitySystemComponent;
+class UShootingAttributeSet;
 class USpringArmComponent;
 class UCameraComponent;
 struct FInputActionValue;
@@ -123,6 +124,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
 	TObjectPtr<UMLLikeAbilitySystemComponent> ASC;
+
+	UPROPERTY()
+	TObjectPtr<UShootingAttributeSet> ShootingAttributeSet;
 public:
 	
 	/** Constructor */

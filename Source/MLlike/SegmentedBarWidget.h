@@ -6,12 +6,29 @@
 #include "MLlikeWidget.h"
 #include "SegmentedBarWidget.generated.h"
 
+class UListView;
+
 /**
  * 
  */
-UCLASS()
-class MLLIKE_API USegmentedBarWidget : public UMLlikeWidget
+UCLASS(MinimalAPI)
+class USegmentedBarWidget : public UMLlikeWidget
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void NativeOnInitialized() override;
+	virtual void NativeDestruct() override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_OnShotFired(const int32 RemainingAmmo);
+
+private:
+	// this is too specific for the ammo, should not be in USegmentedBarWidget that intends to be more generic
+	UFUNCTION()
+	void OnShotFired(const int32 RemainingAmmo);
 	
+protected:
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	TObjectPtr<UListView> SegmentsList;
 };

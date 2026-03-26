@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "MLlikeWidget.h"
+#include "Blueprint/IUserObjectListEntry.h"
 #include "BarSegmentWidget.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class MLLIKE_API UBarSegmentWidget : public UMLlikeWidget
+UCLASS(MinimalAPI)
+class UBarSegmentWidget : public UMLlikeWidget, public IUserObjectListEntry
 {
 	GENERATED_BODY()
 	

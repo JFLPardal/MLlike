@@ -20,9 +20,6 @@ protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeDestruct() override;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void BP_OnShotFired(const int32 RemainingAmmo);
-
 private:
 	// this is too specific for the ammo, should not be in USegmentedBarWidget that intends to be more generic
 	UFUNCTION()

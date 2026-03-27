@@ -2,6 +2,7 @@
 
 #include "SegmentedBarWidget.h"
 
+#include "BarSegmentWidget.h"
 #include "Components/ListView.h"
 #include "MLlikeUtils.h"
 #include "MLlikeLogCategories.h"
@@ -24,13 +25,15 @@ void USegmentedBarWidget::NativeOnInitialized()
 	const int32 MaxAmmo = 5;
 	for (int i = 0; i < MaxAmmo; i++)
 	{
-		if (UUserWidget* const Segment = CreateWidget(SegmentsList, SegmentsList->GetEntryWidgetClass()); IsValid(Segment))
+		if (UBarSegmentData* BarSegmentData = NewObject<UBarSegmentData>(this); IsValid(BarSegmentData))
 		{
-			SegmentsList->AddItem(Segment);
+			//	TODO - this should be set according to initial bullets
+			BarSegmentData->SetIsBarSegmentActive(true);
+			SegmentsList->AddItem(BarSegmentData);
 		}
 		else
 		{
-			UE_LOG(LogMLlikeUI, Error, TEXT("%s - Could not create segment to add to segment bar"), TEXT(__FUNCSIG__));
+			UE_LOG(LogMLlikeUI, Error, TEXT("%s - Could not create bar segment data to add to segment bar"), TEXT(__FUNCSIG__));
 		}
 	}
 	
@@ -38,7 +41,10 @@ void USegmentedBarWidget::NativeOnInitialized()
 
 void USegmentedBarWidget::OnShotFired(const int32 RemainingAmmo)
 {
-	BP_OnShotFired(RemainingAmmo);
+	if (UBarSegmentData* const Data = Cast<UBarSegmentData>(SegmentsList->GetItemAt(RemainingAmmo)); IsValid(Data))
+	{
+		Data->SetIsBarSegmentActive(false);
+	}
 }
 
 void USegmentedBarWidget::NativeDestruct()

@@ -66,9 +66,9 @@ void ATwinStickCharacter::BeginPlay()
 
 	if (IsValid(ShootingAttributeSet))
 	{
-		ShootingAttributeSet->OnShotFired.BindLambda([this](int32 RemainingAmmo) 
+		ShootingAttributeSet->OnCurrentAmmoAmountChanged.BindLambda([this](FAmmoAmountChangedData AmmoAmountChangedData)
 		{ 
-			OnShotFired.Broadcast(RemainingAmmo);
+			OnCurrentAmmoAmountChanged.Broadcast(AmmoAmountChangedData);
 		});
 	}
 }

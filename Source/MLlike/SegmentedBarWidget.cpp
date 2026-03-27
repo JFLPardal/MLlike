@@ -14,7 +14,7 @@ void USegmentedBarWidget::NativeOnInitialized()
 
 	if (ATwinStickCharacter* const Character = MLlikeUtils::GetPlayerCharacter(GetWorld()); IsValid(Character))
 	{
-		Character->OnShotFired.AddDynamic(this, &USegmentedBarWidget::OnShotFired);
+		Character->OnCurrentAmmoAmountChanged.AddDynamic(this, &USegmentedBarWidget::OnCurrentAmmoAmountChanged);
 	}
 	else
 	{
@@ -39,11 +39,29 @@ void USegmentedBarWidget::NativeOnInitialized()
 	
 }
 
-void USegmentedBarWidget::OnShotFired(const int32 RemainingAmmo)
+void USegmentedBarWidget::OnCurrentAmmoAmountChanged(const FAmmoAmountChangedData AmmoAmountChangedData)
 {
-	if (UBarSegmentData* const Data = Cast<UBarSegmentData>(SegmentsList->GetItemAt(RemainingAmmo)); IsValid(Data))
+	if (AmmoAmountChangedData.AmmoChangedOperation == EAmmoChangedOperation::NotSpecified || AmmoAmountChangedData.RemainingAmmo < 0)
 	{
-		Data->SetIsBarSegmentActive(false);
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - FAmmoAmountChangedData was not properly set - Can't update widget"), TEXT(__FUNCSIG__));
+		return;
+	}
+
+	const int32 InvalidIndex = -1;
+	const int32 SegmentToUpdateIndex =
+		AmmoAmountChangedData.AmmoChangedOperation == EAmmoChangedOperation::AmmoAdded ?
+		AmmoAmountChangedData.RemainingAmmo -1 : AmmoAmountChangedData.AmmoChangedOperation == EAmmoChangedOperation::AmmoUsed ?
+		AmmoAmountChangedData.RemainingAmmo : InvalidIndex;
+
+	if (SegmentToUpdateIndex == InvalidIndex)
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - FAmmoAmountChangedData was not properly set - Can't update widget"), TEXT(__FUNCSIG__));
+		return;
+	}
+
+	if (UBarSegmentData* const Data = Cast<UBarSegmentData>(SegmentsList->GetItemAt(SegmentToUpdateIndex)); IsValid(Data))
+	{
+		Data->ToggleIsBarSegmentActive();
 	}
 }
 
@@ -51,7 +69,7 @@ void USegmentedBarWidget::NativeDestruct()
 {
 	if (ATwinStickCharacter* const Character = MLlikeUtils::GetPlayerCharacter(GetWorld()); IsValid(Character))
 	{
-		Character->OnShotFired.RemoveDynamic(this, &USegmentedBarWidget::OnShotFired);
+		Character->OnCurrentAmmoAmountChanged.RemoveDynamic(this, &USegmentedBarWidget::OnCurrentAmmoAmountChanged);
 	}
 	
 	Super::NativeDestruct();

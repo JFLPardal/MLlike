@@ -17,10 +17,7 @@ void UBarSegmentWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
 
 void UBarSegmentWidget::OnBarSegmentDataChanged(bool bBarSegmentActive)
 {
-    if (!bBarSegmentActive)
-    {
-        PlayAnimation(HideAnimation);
-    }
+    PlayAnimation(ShowHideAnimation, /*StartTime*/ 0.0f, /*NumberOfLoops*/ 1, bBarSegmentActive ? EUMGSequencePlayMode::Forward : EUMGSequencePlayMode::Reverse);
 }
 
 void UBarSegmentData::SetIsBarSegmentActive(bool bIsActive)
@@ -30,6 +27,11 @@ void UBarSegmentData::SetIsBarSegmentActive(bool bIsActive)
         bIsBarSegmentActive = bIsActive;
         OnBarSegmentDataChanged.ExecuteIfBound(bIsBarSegmentActive);
     }
+}
+
+void UBarSegmentData::ToggleIsBarSegmentActive()
+{
+    SetIsBarSegmentActive(!bIsBarSegmentActive);
 }
 
 void UBarSegmentWidget::NativeDestruct()

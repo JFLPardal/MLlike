@@ -33,9 +33,10 @@ void UShootingAttributeSet::PostAttributeChange(const FGameplayAttribute& Attrib
 				ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(OutOfAmmoTagName));
 		}
 
-		if (const bool ShootFired = OldValue > NewValue)
+		if (OldValue != NewValue)
 		{
-			OnShotFired.ExecuteIfBound(NewValue);
+			FAmmoAmountChangedData AmmoAmountChangedData (NewValue, OldValue > NewValue ? EAmmoChangedOperation::AmmoUsed : EAmmoChangedOperation::AmmoAdded);
+			OnCurrentAmmoAmountChanged.ExecuteIfBound(AmmoAmountChangedData);
 		}
 	}
 

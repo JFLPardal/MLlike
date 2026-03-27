@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
+#include "AmmoAmountChangedData.h"
 #include "ShootingAttributeSet.generated.h"
 
-DECLARE_DELEGATE_OneParam(FASOnShotFired, int32 /*RemainingAmmo*/);
+DECLARE_DELEGATE_OneParam(FASOnCurrentAmmoAmountChanged, FAmmoAmountChangedData);
 
 /**
  * 
@@ -32,5 +33,5 @@ public:
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, Ammo);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxAmmo);
 
-	FASOnShotFired OnShotFired;
+	FASOnCurrentAmmoAmountChanged OnCurrentAmmoAmountChanged;
 };

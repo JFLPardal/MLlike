@@ -20,6 +20,7 @@ public:
 
 	void SetIsBarSegmentActive(const bool bIsActive);
 	bool GetIsBarSegmentActive() const { return bIsBarSegmentActive; }
+	void ToggleIsBarSegmentActive();
 
 private:
 	bool bIsBarSegmentActive = true;
@@ -39,7 +40,7 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidgetAnim), Transient)
-	TObjectPtr<UWidgetAnimation> HideAnimation;
+	TObjectPtr<UWidgetAnimation> ShowHideAnimation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bIsBarSegmentActive;

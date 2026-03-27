@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerController.h"
+#include "AmmoAmountChangedData.h"
 #include "TwinStickCharacter.generated.h"
 
 class UMLLikeAbilitySystemComponent;
@@ -17,7 +18,7 @@ class UInputAction;
 class ATwinStickAoEAttack;
 class ATwinStickProjectile;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShotFired, int32, RemainingAmmo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShotFired, FAmmoAmountChangedData, AmmoAmountChangedData);
 
 /**
  *  A player-controlled character for a Twin Stick Shooter game
@@ -135,7 +136,7 @@ public:
 	ATwinStickCharacter();
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FOnShotFired OnShotFired;
+	FOnShotFired OnCurrentAmmoAmountChanged;
 protected:
 
 	/** Gameplay Initialization */

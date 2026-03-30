@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "MLlikeWidget.h"
 #include "AmmoAmountChangedData.h"
+#include "CoreMinimal.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
+#include "MLlikeWidget.h"
+
 #include "SegmentedBarWidget.generated.h"
 
 class UListView;
@@ -24,9 +26,12 @@ protected:
 private:
 	// this is too specific for the ammo, should not be in USegmentedBarWidget that intends to be more generic
 	UFUNCTION()
-	void OnCurrentAmmoAmountChanged(const FAmmoAmountChangedData AmmoAmountChangedData);
+	void OnCurrentAmmoAmountChanged(FGameplayTag Channel, const FAmmoAmountChangedData& AmmoAmountChangedData);
 	
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UListView> SegmentsList;
+
+private:
+	FGameplayMessageListenerHandle AmmoChangedHandle;
 };

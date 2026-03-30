@@ -3,6 +3,9 @@
 
 #include "ShootingAttributeSet.h"
 
+#include "GameFramework/GameplayMessageSubsystem.h"
+#include "MLlikeGameplayTags.h"
+
 UShootingAttributeSet::UShootingAttributeSet()
 {
 	// TODO: find a suitable home for this guy :)
@@ -35,8 +38,10 @@ void UShootingAttributeSet::PostAttributeChange(const FGameplayAttribute& Attrib
 
 		if (OldValue != NewValue)
 		{
-			FAmmoAmountChangedData AmmoAmountChangedData (NewValue, OldValue > NewValue ? EAmmoChangedOperation::AmmoUsed : EAmmoChangedOperation::AmmoAdded);
-			OnCurrentAmmoAmountChanged.ExecuteIfBound(AmmoAmountChangedData);
+			FAmmoAmountChangedData AmmoAmountChangedData{ NewValue, OldValue > NewValue ? EAmmoChangedOperation::AmmoUsed : EAmmoChangedOperation::AmmoAdded };
+			
+			UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
+			GameplayMessageSubsystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_AmmoAmountChanged_Message, AmmoAmountChangedData);
 		}
 	}
 

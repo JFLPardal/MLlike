@@ -4,22 +4,17 @@
 
 #include "BarSegmentWidget.h"
 #include "Components/ListView.h"
-#include "MLlikeUtils.h"
+#include "MLlikeGameplayTags.h"
 #include "MLlikeLogCategories.h"
-#include "TwinStickCharacter.h"
+#include "MLlikeUtils.h"
+
 
 void USegmentedBarWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	if (ATwinStickCharacter* const Character = MLlikeUtils::GetPlayerCharacter(GetWorld()); IsValid(Character))
-	{
-		Character->OnCurrentAmmoAmountChanged.AddDynamic(this, &USegmentedBarWidget::OnCurrentAmmoAmountChanged);
-	}
-	else
-	{
-		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - No Character was found"), TEXT(__FUNCSIG__));
-	}
+	UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
+	AmmoChangedHandle = GameplayMessageSubsystem.RegisterListener(MLlikeGameplayTags::TAG_MLlike_AmmoAmountChanged_Message, this, &USegmentedBarWidget::OnCurrentAmmoAmountChanged);
 
 	// TODO - fetch this from the ammo attribute
 	const int32 MaxAmmo = 5;
@@ -39,38 +34,38 @@ void USegmentedBarWidget::NativeOnInitialized()
 	
 }
 
-void USegmentedBarWidget::OnCurrentAmmoAmountChanged(const FAmmoAmountChangedData AmmoAmountChangedData)
+void USegmentedBarWidget::OnCurrentAmmoAmountChanged(FGameplayTag Channel, const FAmmoAmountChangedData& AmmoAmountChangedData)
 {
-	if (AmmoAmountChangedData.AmmoChangedOperation == EAmmoChangedOperation::NotSpecified || AmmoAmountChangedData.RemainingAmmo < 0)
+	if (Channel == MLlikeGameplayTags::TAG_MLlike_AmmoAmountChanged_Message)
 	{
-		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - FAmmoAmountChangedData was not properly set - Can't update widget"), TEXT(__FUNCSIG__));
-		return;
-	}
+		if (AmmoAmountChangedData.AmmoChangedOperation == EAmmoChangedOperation::NotSpecified || AmmoAmountChangedData.RemainingAmmo < 0)
+		{
+			UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - FAmmoAmountChangedData was not properly set - Can't update widget"), TEXT(__FUNCSIG__));
+			return;
+		}
 
-	const int32 InvalidIndex = -1;
-	const int32 SegmentToUpdateIndex =
-		AmmoAmountChangedData.AmmoChangedOperation == EAmmoChangedOperation::AmmoAdded ?
-		AmmoAmountChangedData.RemainingAmmo -1 : AmmoAmountChangedData.AmmoChangedOperation == EAmmoChangedOperation::AmmoUsed ?
-		AmmoAmountChangedData.RemainingAmmo : InvalidIndex;
+		const int32 InvalidIndex = -1;
+		const int32 SegmentToUpdateIndex =
+			AmmoAmountChangedData.AmmoChangedOperation == EAmmoChangedOperation::AmmoAdded ?
+			AmmoAmountChangedData.RemainingAmmo -1 : AmmoAmountChangedData.AmmoChangedOperation == EAmmoChangedOperation::AmmoUsed ?
+			AmmoAmountChangedData.RemainingAmmo : InvalidIndex;
 
-	if (SegmentToUpdateIndex == InvalidIndex)
-	{
-		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - FAmmoAmountChangedData was not properly set - Can't update widget"), TEXT(__FUNCSIG__));
-		return;
-	}
+		if (SegmentToUpdateIndex == InvalidIndex)
+		{
+			UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - FAmmoAmountChangedData was not properly set - Can't update widget"), TEXT(__FUNCSIG__));
+			return;
+		}
 
-	if (UBarSegmentData* const Data = Cast<UBarSegmentData>(SegmentsList->GetItemAt(SegmentToUpdateIndex)); IsValid(Data))
-	{
-		Data->ToggleIsBarSegmentActive();
+		if (UBarSegmentData* const Data = Cast<UBarSegmentData>(SegmentsList->GetItemAt(SegmentToUpdateIndex)); IsValid(Data))
+		{
+			Data->ToggleIsBarSegmentActive();
+		}
 	}
 }
 
 void USegmentedBarWidget::NativeDestruct()
 {
-	if (ATwinStickCharacter* const Character = MLlikeUtils::GetPlayerCharacter(GetWorld()); IsValid(Character))
-	{
-		Character->OnCurrentAmmoAmountChanged.RemoveDynamic(this, &USegmentedBarWidget::OnCurrentAmmoAmountChanged);
-	}
-	
+	AmmoChangedHandle.Unregister();
+
 	Super::NativeDestruct();
 }

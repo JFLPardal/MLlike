@@ -63,14 +63,6 @@ void ATwinStickCharacter::BeginPlay()
 	{
 		ASC->InitAbilityActorInfo(this, this);
 	}
-
-	if (IsValid(ShootingAttributeSet))
-	{
-		ShootingAttributeSet->OnCurrentAmmoAmountChanged.BindLambda([this](FAmmoAmountChangedData AmmoAmountChangedData)
-		{ 
-			OnCurrentAmmoAmountChanged.Broadcast(AmmoAmountChangedData);
-		});
-	}
 }
 
 void ATwinStickCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)

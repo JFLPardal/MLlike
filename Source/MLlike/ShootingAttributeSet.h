@@ -4,14 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
-#include "AmmoAmountChangedData.h"
 #include "ShootingAttributeSet.generated.h"
-
-DECLARE_DELEGATE_OneParam(FASOnCurrentAmmoAmountChanged, FAmmoAmountChangedData);
 
 /**
  * 
  */
+
 UCLASS()
 class MLLIKE_API UShootingAttributeSet : public UAttributeSet
 {
@@ -30,8 +28,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FGameplayAttributeData MaxAmmo;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FGameplayAttributeData Energy;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FGameplayAttributeData MaxEnergy;
+
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, Ammo);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxAmmo);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, Energy);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxEnergy);
 
-	FASOnCurrentAmmoAmountChanged OnCurrentAmmoAmountChanged;
 };

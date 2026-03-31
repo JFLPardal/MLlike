@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include "AmmoAmountChangedData.h"
 #include "CoreMinimal.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "MLlikeWidget.h"
 
 #include "SegmentedBarWidget.generated.h"
 
+struct FAmmoAmountChangedData;
+struct FEnergyAmountChangedData;
 class UListView;
 
 /**
@@ -28,10 +29,15 @@ private:
 	UFUNCTION()
 	void OnCurrentAmmoAmountChanged(FGameplayTag Channel, const FAmmoAmountChangedData& AmmoAmountChangedData);
 	
+	UFUNCTION()
+	void OnCurrentEnergyAmountChanged(FGameplayTag Channel, const FEnergyAmountChangedData& EnergyAmountChangedData);
+
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UListView> SegmentsList;
 
+
 private:
 	FGameplayMessageListenerHandle AmmoChangedHandle;
+	FGameplayMessageListenerHandle EnergyChangedHandle;
 };

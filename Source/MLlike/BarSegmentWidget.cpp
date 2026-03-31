@@ -3,6 +3,30 @@
 
 #include "BarSegmentWidget.h"
 
+#include "Components/ProgressBar.h"
+
+void UBarSegmentData::SetIsBarSegmentActive(bool bIsActive)
+{
+    if (bIsActive != m_bIsBarSegmentActive)
+    {
+        m_bIsBarSegmentActive = bIsActive;
+        // TODO check these values before commiting
+        OnBarSegmentDataChanged.ExecuteIfBound(m_bIsBarSegmentActive, /*OldProgress*/ m_Progress, /*NewProgress*/ m_Progress);
+    }
+}
+
+void UBarSegmentData::ToggleIsBarSegmentActive()
+{
+    SetIsBarSegmentActive(!m_bIsBarSegmentActive);
+}
+
+void UBarSegmentData::SetBarSegmentProgress(float NewProgress)
+{
+    const float OldProgress = m_Progress;
+    m_Progress = NewProgress;
+    OnBarSegmentDataChanged.ExecuteIfBound(m_bIsBarSegmentActive, OldProgress, m_Progress);
+}
+
 void UBarSegmentWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
     if (UBarSegmentData* const SegmentData = Cast<UBarSegmentData>(ListItemObject); IsValid(SegmentData))
@@ -15,23 +39,17 @@ void UBarSegmentWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
     IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 }
 
-void UBarSegmentWidget::OnBarSegmentDataChanged(bool bBarSegmentActive)
+void UBarSegmentWidget::OnBarSegmentDataChanged(bool bBarSegmentActive, float OldProgress, float NewProgress)
 {
-    PlayAnimation(ShowHideAnimation, /*StartTime*/ 0.0f, /*NumberOfLoops*/ 1, bBarSegmentActive ? EUMGSequencePlayMode::Forward : EUMGSequencePlayMode::Reverse);
-}
-
-void UBarSegmentData::SetIsBarSegmentActive(bool bIsActive)
-{
-    if (bIsActive != bIsBarSegmentActive)
+    // TODO needs revisiting
+    if (FMath::IsNearlyEqual(OldProgress, NewProgress, UE_KINDA_SMALL_NUMBER))
     {
-        bIsBarSegmentActive = bIsActive;
-        OnBarSegmentDataChanged.ExecuteIfBound(bIsBarSegmentActive);
+        PlayAnimation(ShowHideAnimation, /*StartTime*/ 0.0f, /*NumberOfLoops*/ 1, bBarSegmentActive ? EUMGSequencePlayMode::Forward : EUMGSequencePlayMode::Reverse);
     }
-}
-
-void UBarSegmentData::ToggleIsBarSegmentActive()
-{
-    SetIsBarSegmentActive(!bIsBarSegmentActive);
+    else
+    {
+        m_ProgressBar->SetPercent(NewProgress);
+    }
 }
 
 void UBarSegmentWidget::NativeDestruct()

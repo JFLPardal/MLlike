@@ -2,6 +2,8 @@
 
 #include "SegmentedBarWidget.h"
 
+#include "AmmoAmountChangedData.h"
+#include "EnergyAmountChangedData.h"
 #include "BarSegmentWidget.h"
 #include "Components/ListView.h"
 #include "MLlikeGameplayTags.h"
@@ -15,7 +17,8 @@ void USegmentedBarWidget::NativeOnInitialized()
 
 	UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
 	AmmoChangedHandle = GameplayMessageSubsystem.RegisterListener(MLlikeGameplayTags::TAG_MLlike_AmmoAmountChanged_Message, this, &USegmentedBarWidget::OnCurrentAmmoAmountChanged);
-
+	EnergyChangedHandle = GameplayMessageSubsystem.RegisterListener(MLlikeGameplayTags::TAG_MLlike_EnergyAmountChanged_Message, this, &USegmentedBarWidget::OnCurrentEnergyAmountChanged);
+	
 	// TODO - fetch this from the ammo attribute
 	const int32 MaxAmmo = 5;
 	for (int i = 0; i < MaxAmmo; i++)
@@ -60,6 +63,21 @@ void USegmentedBarWidget::OnCurrentAmmoAmountChanged(FGameplayTag Channel, const
 		{
 			Data->ToggleIsBarSegmentActive();
 		}
+	}
+}
+
+void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, const FEnergyAmountChangedData& EnergyAmountChangedData)
+{
+	// TODO get this from ShootingAttributeSet
+	const int32 MaxEnergy = 100;
+	const int32 EnergyPerSegment = FMath::DivideAndRoundDown(MaxEnergy, SegmentsList->GetNumItems());
+	const float NewEnergyDivEnergyPerSegment = EnergyAmountChangedData.NewValue / static_cast<float>(EnergyPerSegment);
+	const int32 SegmentToUpdateIndex = FMath::Floor(NewEnergyDivEnergyPerSegment);
+	const float SegmentToUpdateProgress = FMath::Frac(NewEnergyDivEnergyPerSegment);
+
+	if (UBarSegmentData* const SegmentToUpdateData = Cast<UBarSegmentData>(SegmentsList->GetItemAt(SegmentToUpdateIndex)); IsValid(SegmentToUpdateData))
+	{
+		SegmentToUpdateData->SetBarSegmentProgress(SegmentToUpdateProgress);
 	}
 }
 

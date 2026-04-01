@@ -3,7 +3,7 @@
 
 #include "ShootingAttributeSet.h"
 
-#include "AmmoAmountChangedData.h"
+#include "AbilitySystemComponent.h"
 #include "EnergyAmountChangedData.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "MLlikeGameplayTags.h"
@@ -12,7 +12,6 @@ UShootingAttributeSet::UShootingAttributeSet()
 {
 	// TODO: find a suitable home for this guy :)
 	InitMaxAmmo(5);
-	InitAmmo(GetMaxAmmo());
 
 	InitMaxEnergy(100);
 	InitEnergy(GetMaxEnergy());
@@ -20,11 +19,7 @@ UShootingAttributeSet::UShootingAttributeSet()
 
 void UShootingAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
 {
-	if (Attribute == GetAmmoAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0, GetMaxAmmo());
-	}
-	else if (Attribute == GetEnergyAttribute())
+	if (Attribute == GetEnergyAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0, GetMaxEnergy());
 	}
@@ -34,27 +29,16 @@ void UShootingAttributeSet::PostAttributeChange(const FGameplayAttribute& Attrib
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 
-	if (Attribute == GetAmmoAttribute())
+	if (Attribute == GetEnergyAttribute())
 	{
 		// out of ammo? 
 		if (UAbilitySystemComponent* const ASC = GetOwningAbilitySystemComponent(); IsValid(ASC))
 		{
-			(NewValue == 0) ?
+			(GetEnergy() < GetMaxEnergy() / GetMaxAmmo() && ASC->GetGameplayTagCount(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo) == 0) ?
 				ASC->AddLooseGameplayTag(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo) :
 				ASC->RemoveLooseGameplayTag(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo);
 		}
 
-		if (OldValue != NewValue)
-		{
-			const EAmmoChangedOperation Operation = OldValue > NewValue ? EAmmoChangedOperation::AmmoUsed : EAmmoChangedOperation::AmmoAdded;
-			FAmmoAmountChangedData AmmoAmountChangedData{ NewValue, Operation };
-			
-			UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
-			GameplayMessageSubsystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_AmmoAmountChanged_Message, AmmoAmountChangedData);
-		}
-	}
-	else if (Attribute == GetEnergyAttribute())
-	{
 		FEnergyAmountChangedData EnergyAmountChangedData{ OldValue, NewValue };
 		
 		UGameplayMessageSubsystem& GameplayMessageSubystem = UGameplayMessageSubsystem::Get(GetWorld());

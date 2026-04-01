@@ -15,19 +15,14 @@ class UBarSegmentData : public UObject
 {
 	GENERATED_BODY()
 
-	DECLARE_DELEGATE_ThreeParams(FOnBarSegmentDataChanged, bool /*bIsBarSegmentActive*/, float /*OldProgress*/, float /*NewProgress*/);
+	DECLARE_DELEGATE_TwoParams(FOnBarSegmentDataChanged, float /*OldProgress*/, float /*NewProgress*/);
 
 public:
 	FOnBarSegmentDataChanged OnBarSegmentDataChanged;
- 
-	void SetIsBarSegmentActive(const bool bIsActive);
-	bool GetIsBarSegmentActive() const { return m_bIsBarSegmentActive; }
-	void ToggleIsBarSegmentActive();
 
 	void SetBarSegmentProgress(float NewProgress);
 
 private:
-	bool m_bIsBarSegmentActive = true;
 	float m_Progress = 0.0f;
 };
 
@@ -47,12 +42,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> ShowHideAnimation;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> SegmentFullAnimation;
+
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UProgressBar> m_ProgressBar;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool bIsBarSegmentActive;
-
 private:
-	void OnBarSegmentDataChanged(bool bBarSegmentActive, float OldProgress, float NewProgress);
+	void OnBarSegmentDataChanged(float OldProgress, float NewProgress);
 };

@@ -8,7 +8,6 @@
 
 #include "SegmentedBarWidget.generated.h"
 
-struct FAmmoAmountChangedData;
 struct FEnergyAmountChangedData;
 class UListView;
 
@@ -25,10 +24,7 @@ protected:
 	virtual void NativeDestruct() override;
 
 private:
-	// this is too specific for the ammo, should not be in USegmentedBarWidget that intends to be more generic
-	UFUNCTION()
-	void OnCurrentAmmoAmountChanged(FGameplayTag Channel, const FAmmoAmountChangedData& AmmoAmountChangedData);
-	
+	// this is too specific for the ammo, should not be in USegmentedBarWidget that intends to be more generic	
 	UFUNCTION()
 	void OnCurrentEnergyAmountChanged(FGameplayTag Channel, const FEnergyAmountChangedData& EnergyAmountChangedData);
 
@@ -38,6 +34,5 @@ protected:
 
 
 private:
-	FGameplayMessageListenerHandle AmmoChangedHandle;
 	FGameplayMessageListenerHandle EnergyChangedHandle;
 };

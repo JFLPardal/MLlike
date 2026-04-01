@@ -5,9 +5,7 @@
 #include "NativeGameplayTags.h"
 
 namespace MLlikeGameplayTags
-{
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_AmmoAmountChanged_Message);
-	
+{	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_EnergyAmountChanged_Message);
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Ability_Shooting_OutOfAmmo);

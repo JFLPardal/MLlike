@@ -23,9 +23,6 @@ public:
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FGameplayAttributeData Ammo;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FGameplayAttributeData MaxAmmo;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -34,7 +31,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FGameplayAttributeData MaxEnergy;
 
-	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, Ammo);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxAmmo);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, Energy);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxEnergy);

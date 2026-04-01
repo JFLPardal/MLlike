@@ -6,8 +6,6 @@
 
 namespace MLlikeGameplayTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_AmmoAmountChanged_Message, "AmmoAmountChanged.Message");
-
 	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_EnergyAmountChanged_Message, "EnergyAmmountChanged.Message");
 
 	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Ability_Shooting_OutOfAmmo, "Abilities.Shoot.OutOfAmmo");

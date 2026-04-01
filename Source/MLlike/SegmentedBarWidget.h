@@ -9,6 +9,7 @@
 #include "SegmentedBarWidget.generated.h"
 
 struct FEnergyAmountChangedData;
+struct FMaxAmmoChangedData;
 class UListView;
 
 /**
@@ -28,6 +29,9 @@ private:
 	UFUNCTION()
 	void OnCurrentEnergyAmountChanged(FGameplayTag Channel, const FEnergyAmountChangedData& EnergyAmountChangedData);
 
+	UFUNCTION()
+	void OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoChangedData& EnergyAmountChangedData);
+
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UListView> SegmentsList;
@@ -35,4 +39,5 @@ protected:
 
 private:
 	FGameplayMessageListenerHandle EnergyChangedHandle;
+	FGameplayMessageListenerHandle MaxAmmoChangedHandle;
 };

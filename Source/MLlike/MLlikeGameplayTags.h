@@ -8,6 +8,8 @@ namespace MLlikeGameplayTags
 {	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_EnergyAmountChanged_Message);
 	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_MaxAmmoAmountChanged_Message);
+	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Ability_Shooting_OutOfAmmo);
 };
 

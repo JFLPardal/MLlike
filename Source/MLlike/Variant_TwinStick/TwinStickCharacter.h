@@ -16,6 +16,7 @@ class APlayerController;
 class UInputAction;
 class ATwinStickAoEAttack;
 class ATwinStickProjectile;
+class UGameplayEffect;
 
 /**
  *  A player-controlled character for a Twin Stick Shooter game
@@ -127,6 +128,13 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UShootingAttributeSet> ShootingAttributeSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=ShootingAttributeSet, meta=(UIMin=1, UIMax=10, ClampMin=1, ClampMax=10))
+	int32 MaxInitialAmmo = 4;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ShootingAttributeSet)
+	TSubclassOf<UGameplayEffect> ShootingAttributeSetInitGE = nullptr;
+
 public:
 	
 	/** Constructor */

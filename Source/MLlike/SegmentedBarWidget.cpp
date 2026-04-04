@@ -17,24 +17,7 @@ void USegmentedBarWidget::NativeOnInitialized()
 
 	UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
 	EnergyChangedHandle = GameplayMessageSubsystem.RegisterListener(MLlikeGameplayTags::TAG_MLlike_EnergyAmountChanged_Message, this, &USegmentedBarWidget::OnCurrentEnergyAmountChanged);
-	MaxAmmoChangedHandle = GameplayMessageSubsystem.RegisterListener(MLlikeGameplayTags::TAG_MLlike_MaxAmmoAmountChanged_Message, this, &USegmentedBarWidget::OnMaxAmmoChanged);
-
-	// TODO - fetch this from the ammo attribute
-	const int32 MaxAmmo = 5;
-	for (int i = 0; i < MaxAmmo; ++i)
-	{
-		if (UBarSegmentData* BarSegmentData = NewObject<UBarSegmentData>(this); IsValid(BarSegmentData))
-		{
-			// this implies bullets always start full
-			BarSegmentData->SetBarSegmentProgress(1.0f);
-			SegmentsList->AddItem(BarSegmentData);
-		}
-		else
-		{
-			UE_LOG(LogMLlikeUI, Error, TEXT("%s - Could not create bar segment data to add to segment bar"), TEXT(__FUNCSIG__));
-		}
-	}
-	
+	MaxAmmoChangedHandle = GameplayMessageSubsystem.RegisterListener(MLlikeGameplayTags::TAG_MLlike_MaxAmmoAmountChanged_Message, this, &USegmentedBarWidget::OnMaxAmmoChanged);	
 }
 
 void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, const FEnergyAmountChangedData& EnergyAmountChangedData)

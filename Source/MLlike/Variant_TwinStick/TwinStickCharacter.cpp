@@ -14,6 +14,7 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "MLLikeAbilitySystemComponent.h"
+#include "MLlikeGameplayTags.h"
 #include "ShootingAttributeSet.h"
 
 ATwinStickCharacter::ATwinStickCharacter()
@@ -62,6 +63,14 @@ void ATwinStickCharacter::BeginPlay()
 	if (IsValid(ASC))
 	{
 		ASC->InitAbilityActorInfo(this, this);
+
+		// initialize ShootingAttributeSet's values
+		FGameplayEffectSpecHandle InitShootAttributesSpecHandle = ASC->MakeOutgoingSpec(ShootingAttributeSetInitGE,/*Level*/1.0f, ASC->MakeEffectContext());
+		if (InitShootAttributesSpecHandle.IsValid())
+		{
+			InitShootAttributesSpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_Shooting_MaxAmmo, MaxInitialAmmo);
+			ASC->ApplyGameplayEffectSpecToSelf(*InitShootAttributesSpecHandle.Data);
+		}
 	}
 }
 

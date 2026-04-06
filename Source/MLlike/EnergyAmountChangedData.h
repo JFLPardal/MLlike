@@ -15,4 +15,7 @@ struct FEnergyAmountChangedData
 
 	UPROPERTY()
 	int32 NewValue = -1;
+
+	UPROPERTY()
+	int32 EnergyCostPerShot = -1;
 };

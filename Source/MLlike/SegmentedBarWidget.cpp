@@ -22,9 +22,7 @@ void USegmentedBarWidget::NativeOnInitialized()
 
 void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, const FEnergyAmountChangedData& EnergyAmountChangedData)
 {
-	// TODO get this from ShootingAttributeSet
-	const int32 MaxEnergy = 100;
-	const int32 EnergyPerSegment = FMath::DivideAndRoundDown(MaxEnergy, SegmentsList->GetNumItems());
+	const int32 EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
 	const float OldEnergyDivEnergyPerSegment = EnergyAmountChangedData.OldValue / static_cast<float>(EnergyPerSegment);
 	const int32 OldActiveSegmentIndex = FMath::Floor(OldEnergyDivEnergyPerSegment);
 	const float NewEnergyDivEnergyPerSegment = EnergyAmountChangedData.NewValue / static_cast<float>(EnergyPerSegment);
@@ -65,9 +63,7 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 {
 	SegmentsList->ClearListItems();
 
-	// TODO get this from ShootingAttributeSet
-	const int32 MaxEnergy = 100;
-	const int32 EnergyPerSegment = FMath::DivideAndRoundDown(MaxEnergy, EnergyAmountChangedData.NewMaxAmmo);
+	const int32 EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
 	for (int i = 0; i < EnergyAmountChangedData.NewMaxAmmo; i++)
 	{
 		if (UBarSegmentData* BarSegmentData = NewObject<UBarSegmentData>(this); IsValid(BarSegmentData))

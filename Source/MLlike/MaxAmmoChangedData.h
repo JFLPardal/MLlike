@@ -16,4 +16,7 @@ struct FMaxAmmoChangedData
 
 	UPROPERTY()
 	int32 NewMaxAmmo = -1;
+
+	UPROPERTY()
+	int32 EnergyCostPerShot = -1;
 };

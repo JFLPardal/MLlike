@@ -30,9 +30,16 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FGameplayAttributeData MaxEnergy;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FGameplayAttributeData EnergyCostPerShot;
 
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, EnergyCostPerShot);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxAmmo);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, Energy);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxEnergy);
+
+private:
+	void UpdateOutOfAmmo();
 
 };

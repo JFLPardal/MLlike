@@ -8,14 +8,17 @@
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "MaxAmmoChangedData.h"
 #include "MLlikeGameplayTags.h"
+#include "MLlikeLogCategories.h"
 
 UShootingAttributeSet::UShootingAttributeSet()
 {
-	// TODO: find a suitable home for this guy :)
+	// this is just a fallback - the true value is being specified in BP_TwinStickCharacter
 	InitMaxAmmo(5);
 
+	// this value should NEVER change. If we want more bullets, increasing MaxAmmo will adjust the cost of each shot so that we have more shots per same amount of energy
 	InitMaxEnergy(100);
 	InitEnergy(GetMaxEnergy());
+	InitEnergyCostPerShot(FMath::DivideAndRoundDown(GetMaxEnergy(), GetMaxAmmo()));
 }
 
 void UShootingAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
@@ -26,6 +29,7 @@ void UShootingAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Att
 	}
 	else if (Attribute == GetMaxAmmoAttribute())
 	{
+		// TODO find a suitable home for this fella :)
 		NewValue = FMath::Clamp(NewValue, 1, /*MaxAmmoAllowed*/ 10);
 	}
 }
@@ -36,17 +40,12 @@ void UShootingAttributeSet::PostAttributeChange(const FGameplayAttribute& Attrib
 
 	if (Attribute == GetEnergyAttribute())
 	{
-		// out of ammo? 
-		if (UAbilitySystemComponent* const ASC = GetOwningAbilitySystemComponent(); IsValid(ASC))
-		{
-			(GetEnergy() < GetMaxEnergy() / GetMaxAmmo() && ASC->GetGameplayTagCount(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo) == 0) ?
-				ASC->AddLooseGameplayTag(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo) :
-				ASC->RemoveLooseGameplayTag(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo);
-		}
+		UpdateOutOfAmmo();
 
 		FEnergyAmountChangedData EnergyAmountChangedData;
 		EnergyAmountChangedData.OldValue = OldValue;
 		EnergyAmountChangedData.NewValue = NewValue;
+		EnergyAmountChangedData.EnergyCostPerShot = GetEnergyCostPerShot();
 		
 		UGameplayMessageSubsystem& GameplayMessageSubystem = UGameplayMessageSubsystem::Get(GetWorld());
 		GameplayMessageSubystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_EnergyAmountChanged_Message, EnergyAmountChangedData);
@@ -57,13 +56,34 @@ void UShootingAttributeSet::PostAttributeChange(const FGameplayAttribute& Attrib
 		{
 			if (OldValue != NewValue)
 			{
+				SetEnergyCostPerShot(FMath::DivideAndRoundDown(GetMaxEnergy(), NewValue));
+				
+				UpdateOutOfAmmo();
+
 				FMaxAmmoChangedData MaxAmmoChangedData;
 				MaxAmmoChangedData.CurrentEnergy = GetEnergy();
 				MaxAmmoChangedData.NewMaxAmmo = NewValue;
-				
+				MaxAmmoChangedData.EnergyCostPerShot = GetEnergyCostPerShot();
 				UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
 				GameplayMessageSubsystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_MaxAmmoAmountChanged_Message, MaxAmmoChangedData);
+				
+				UE_LOG(LogMLlikeGeneral, Warning, TEXT("New energy cost per shot - %d"), MaxAmmoChangedData.EnergyCostPerShot);
 			}
+		}
+	}
+}
+
+void UShootingAttributeSet::UpdateOutOfAmmo()
+{
+	if (UAbilitySystemComponent* const ASC = GetOwningAbilitySystemComponent(); IsValid(ASC))
+	{
+		if (GetEnergy() < GetEnergyCostPerShot() && ASC->GetGameplayTagCount(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo) == 0)
+		{
+			ASC->AddLooseGameplayTag(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo);
+		}
+		else if (GetEnergy() > GetEnergyCostPerShot())
+		{
+			ASC->RemoveLooseGameplayTag(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo);
 		}
 	}
 }

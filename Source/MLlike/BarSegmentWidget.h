@@ -21,6 +21,7 @@ public:
 	FOnBarSegmentDataChanged OnBarSegmentDataChanged;
 
 	void SetBarSegmentProgress(float NewProgress);
+	float GetBarSegmentProgress() const { return m_Progress; }
 
 private:
 	float m_Progress = 0.0f;
@@ -42,11 +43,14 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> ShowHideAnimation;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetAnim), Transient)
-	TObjectPtr<UWidgetAnimation> SegmentFullAnimation;
-
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UProgressBar> m_ProgressBar;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FLinearColor m_SegmentFullColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FLinearColor m_SegmentNotFullColor;
 
 private:
 	void OnBarSegmentDataChanged(float OldProgress, float NewProgress);

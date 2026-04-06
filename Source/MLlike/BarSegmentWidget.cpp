@@ -18,32 +18,22 @@ void UBarSegmentWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
     if (UBarSegmentData* const SegmentData = Cast<UBarSegmentData>(ListItemObject); IsValid(SegmentData))
     {
         SegmentData->OnBarSegmentDataChanged.BindUObject(this, &UBarSegmentWidget::OnBarSegmentDataChanged);
+
+        OnBarSegmentDataChanged(SegmentData->GetBarSegmentProgress(), SegmentData->GetBarSegmentProgress());
     }
 
     // call this after the rest of the logic as this will eventually call the BP event?
     IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 }
-UE_DISABLE_OPTIMIZATION
+
 void UBarSegmentWidget::OnBarSegmentDataChanged(float OldProgress, float NewProgress)
 {
-    if(FMath::IsNearlyEqual(NewProgress, 1.0f, UE_KINDA_SMALL_NUMBER))
-    {
-        if (!FMath::IsNearlyEqual(OldProgress, 1.0f, UE_KINDA_SMALL_NUMBER))
-        {
-            PlayAnimation(SegmentFullAnimation);
-        }
-        m_ProgressBar->SetPercent(NewProgress);
-    }
-    else if (!FMath::IsNearlyEqual(NewProgress, 1.0f, UE_KINDA_SMALL_NUMBER))
-    {
-        if (FMath::IsNearlyEqual(OldProgress, 1.0f, UE_KINDA_SMALL_NUMBER))
-        {
-            PlayAnimation(SegmentFullAnimation, /*StartTime*/ 0.0f, /*NumberOfLoops*/ 1, EUMGSequencePlayMode::Reverse);
-        }
-        m_ProgressBar->SetPercent(NewProgress);
-    }
+    const bool bIsBarFull = FMath::IsNearlyEqual(NewProgress, 1.0f, UE_KINDA_SMALL_NUMBER);
+
+    m_ProgressBar->SetFillColorAndOpacity(bIsBarFull ? m_SegmentFullColor : m_SegmentNotFullColor);
+    m_ProgressBar->SetPercent(NewProgress);
 }
-UE_ENABLE_OPTIMIZATION
+
 void UBarSegmentWidget::NativeDestruct()
 {
     if (UBarSegmentData* const SegmentData = Cast<UBarSegmentData>(GetListItem()); IsValid(SegmentData) && SegmentData->OnBarSegmentDataChanged.IsBound())

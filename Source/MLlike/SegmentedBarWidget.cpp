@@ -29,25 +29,26 @@ void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, con
 	const int32 SegmentToUpdateIndex = FMath::Floor(NewEnergyDivEnergyPerSegment);
 	const float SegmentToUpdateProgress = FMath::Frac(NewEnergyDivEnergyPerSegment);
 
+	// if energy increases/decreases by more than 1 segment, we need to update the segments in between
 	if (OldActiveSegmentIndex != SegmentToUpdateIndex)
 	{
-		if (OldActiveSegmentIndex < SegmentToUpdateIndex)
+		if (const bool EnergyIncreased = OldActiveSegmentIndex < SegmentToUpdateIndex)
 		{
 			for (int i = OldActiveSegmentIndex; i < SegmentToUpdateIndex; ++i)
 			{
-				if (UBarSegmentData* const SegmentToUpdateData = Cast<UBarSegmentData>(SegmentsList->GetItemAt(OldActiveSegmentIndex)); IsValid(SegmentToUpdateData))
+				if (UBarSegmentData* const SegmentToUpdateData = Cast<UBarSegmentData>(SegmentsList->GetItemAt(i)); IsValid(SegmentToUpdateData))
 				{
-					SegmentToUpdateData->SetBarSegmentProgress(EnergyAmountChangedData.OldValue > EnergyAmountChangedData.NewValue ? 0.0f : 1.f);
+					SegmentToUpdateData->SetBarSegmentProgress(1.0f);
 				}
 			}
 		}
 		else
 		{
-			for (int i = SegmentToUpdateIndex; i < OldActiveSegmentIndex; ++i)
+			for (int i = OldActiveSegmentIndex; i > SegmentToUpdateIndex; --i)
 			{
-				if (UBarSegmentData* const SegmentToUpdateData = Cast<UBarSegmentData>(SegmentsList->GetItemAt(OldActiveSegmentIndex)); IsValid(SegmentToUpdateData))
+				if (UBarSegmentData* const SegmentToUpdateData = Cast<UBarSegmentData>(SegmentsList->GetItemAt(i)); IsValid(SegmentToUpdateData))
 				{
-					SegmentToUpdateData->SetBarSegmentProgress(EnergyAmountChangedData.OldValue > EnergyAmountChangedData.NewValue ? 0.0f : 1.f);
+					SegmentToUpdateData->SetBarSegmentProgress(0.0f);
 				}
 			}
 		}
@@ -64,11 +65,24 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 	SegmentsList->ClearListItems();
 
 	const int32 EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
+	bool bFoundUnfilledBarSegment = false;
 	for (int i = 0; i < EnergyAmountChangedData.NewMaxAmmo; i++)
 	{
 		if (UBarSegmentData* BarSegmentData = NewObject<UBarSegmentData>(this); IsValid(BarSegmentData))
 		{
-			const float SegmentProgress = EnergyAmountChangedData.CurrentEnergy > (i + 1) * EnergyPerSegment ? 1.0f : FMath::Frac((EnergyAmountChangedData.CurrentEnergy / (i + 1) * static_cast<float>(EnergyPerSegment)));
+			float SegmentProgress = 0.0f;
+			if (!bFoundUnfilledBarSegment)
+			{
+				if (EnergyAmountChangedData.CurrentEnergy >= (i + 1) * EnergyPerSegment)
+				{
+					SegmentProgress = 1.0f;
+				}
+				else
+				{
+					SegmentProgress = FMath::Frac((EnergyAmountChangedData.CurrentEnergy - EnergyPerSegment * i) / static_cast<float>(EnergyPerSegment));
+					bFoundUnfilledBarSegment = true;
+				}
+			}
 			BarSegmentData->SetBarSegmentProgress(SegmentProgress);
 			SegmentsList->AddItem(BarSegmentData);
 		}

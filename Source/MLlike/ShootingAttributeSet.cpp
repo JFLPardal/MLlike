@@ -54,21 +54,18 @@ void UShootingAttributeSet::PostAttributeChange(const FGameplayAttribute& Attrib
 	{
 		if (Attribute == GetMaxAmmoAttribute())
 		{
-			if (OldValue != NewValue)
-			{
-				SetEnergyCostPerShot(FMath::DivideAndRoundDown(GetMaxEnergy(), NewValue));
+			SetEnergyCostPerShot(FMath::DivideAndRoundDown(GetMaxEnergy(), NewValue));
 				
-				UpdateOutOfAmmo();
+			UpdateOutOfAmmo();
 
-				FMaxAmmoChangedData MaxAmmoChangedData;
-				MaxAmmoChangedData.CurrentEnergy = GetEnergy();
-				MaxAmmoChangedData.NewMaxAmmo = NewValue;
-				MaxAmmoChangedData.EnergyCostPerShot = GetEnergyCostPerShot();
-				UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
-				GameplayMessageSubsystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_MaxAmmoAmountChanged_Message, MaxAmmoChangedData);
+			FMaxAmmoChangedData MaxAmmoChangedData;
+			MaxAmmoChangedData.CurrentEnergy = GetEnergy();
+			MaxAmmoChangedData.NewMaxAmmo = NewValue;
+			MaxAmmoChangedData.EnergyCostPerShot = GetEnergyCostPerShot();
+			UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
+			GameplayMessageSubsystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_MaxAmmoAmountChanged_Message, MaxAmmoChangedData);
 				
-				UE_LOG(LogMLlikeGeneral, Warning, TEXT("New energy cost per shot - %d"), MaxAmmoChangedData.EnergyCostPerShot);
-			}
+			UE_LOG(LogMLlikeGeneral, Warning, TEXT("New energy cost per shot - %d"), MaxAmmoChangedData.EnergyCostPerShot);
 		}
 	}
 }

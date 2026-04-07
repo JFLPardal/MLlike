@@ -29,8 +29,9 @@ void UBarSegmentWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
 void UBarSegmentWidget::OnBarSegmentDataChanged(float OldProgress, float NewProgress)
 {
     const bool bIsBarFull = FMath::IsNearlyEqual(NewProgress, 1.0f, UE_KINDA_SMALL_NUMBER);
+    const bool bWasBarFull = FMath::IsNearlyEqual(OldProgress, 1.0f, UE_KINDA_SMALL_NUMBER);
 
-    BP_OnProgressChanged(NewProgress, bIsBarFull);
+    BP_OnProgressChanged(NewProgress, bWasBarFull, bIsBarFull);
 }
 
 void UBarSegmentWidget::NativeDestruct()

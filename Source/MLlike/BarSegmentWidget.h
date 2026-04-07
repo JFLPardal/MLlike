@@ -7,6 +7,8 @@
 #include "Blueprint/IUserObjectListEntry.h"
 #include "BarSegmentWidget.generated.h"
 
+class UWidgetAnimation;
+
 UCLASS(MinimalAPI)
 class UBarSegmentData : public UObject
 {
@@ -44,8 +46,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FLinearColor m_SegmentNotFullColor;
 
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> BarFullAnimation;
+
 	UFUNCTION(BlueprintImplementableEvent)
-	void BP_OnProgressChanged(float NewProgress, bool bIsBarFull);
+	void BP_OnProgressChanged(float NewProgress, bool bWasBarFull, bool bIsBarFull);
 
 private:
 	void OnBarSegmentDataChanged(float OldProgress, float NewProgress);

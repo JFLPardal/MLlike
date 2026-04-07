@@ -30,8 +30,7 @@ void UBarSegmentWidget::OnBarSegmentDataChanged(float OldProgress, float NewProg
 {
     const bool bIsBarFull = FMath::IsNearlyEqual(NewProgress, 1.0f, UE_KINDA_SMALL_NUMBER);
 
-    m_ProgressBar->SetFillColorAndOpacity(bIsBarFull ? m_SegmentFullColor : m_SegmentNotFullColor);
-    m_ProgressBar->SetPercent(NewProgress);
+    BP_OnProgressChanged(NewProgress, bIsBarFull);
 }
 
 void UBarSegmentWidget::NativeDestruct()

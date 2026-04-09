@@ -63,6 +63,7 @@ void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, con
 void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoChangedData& EnergyAmountChangedData)
 {
 	SegmentsList->ClearListItems();
+	SegmentsBox->ClearChildren();
 
 	const float EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
 	bool bFoundUnfilledBarSegment = false;
@@ -83,8 +84,11 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 					bFoundUnfilledBarSegment = true;
 				}
 			}
-			BarSegmentData->SetBarSegmentProgress(SegmentProgress);
-			SegmentsList->AddItem(BarSegmentData);
+			//BarSegmentData->SetBarSegmentProgress(SegmentProgress);
+			//SegmentsList->AddItem(BarSegmentData);
+
+			UMLlikeWidget* SegmentWidget = CreateWidget<UMLlikeWidget>(this, SegmentWidgetClass);
+			SegmentsBox->AddChild(SegmentWidget);
 		}
 		else
 		{

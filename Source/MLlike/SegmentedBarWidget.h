@@ -11,6 +11,7 @@
 struct FEnergyAmountChangedData;
 struct FMaxAmmoChangedData;
 class UListView;
+class UPanelWidget;
 
 /**
  * 
@@ -36,6 +37,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UListView> SegmentsList;
 
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	TObjectPtr<UPanelWidget> SegmentsBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UMLlikeWidget> SegmentWidgetClass;
 
 private:
 	FGameplayMessageListenerHandle EnergyChangedHandle;

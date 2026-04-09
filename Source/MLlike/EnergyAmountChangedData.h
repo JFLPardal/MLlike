@@ -11,11 +11,11 @@ struct FEnergyAmountChangedData
 	GENERATED_BODY()
 
 	UPROPERTY()
-	int32 OldValue = -1;
+	float OldValue = -1.0f;
 
 	UPROPERTY()
-	int32 NewValue = -1;
+	float NewValue = -1.0f;
 
 	UPROPERTY()
-	int32 EnergyCostPerShot = -1;
+	float EnergyCostPerShot = -1.0f;
 };

@@ -22,10 +22,10 @@ void USegmentedBarWidget::NativeOnInitialized()
 
 void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, const FEnergyAmountChangedData& EnergyAmountChangedData)
 {
-	const int32 EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
-	const float OldEnergyDivEnergyPerSegment = EnergyAmountChangedData.OldValue / static_cast<float>(EnergyPerSegment);
+	const float EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
+	const float OldEnergyDivEnergyPerSegment = EnergyAmountChangedData.OldValue / EnergyPerSegment;
 	const int32 OldActiveSegmentIndex = FMath::Floor(OldEnergyDivEnergyPerSegment);
-	const float NewEnergyDivEnergyPerSegment = EnergyAmountChangedData.NewValue / static_cast<float>(EnergyPerSegment);
+	const float NewEnergyDivEnergyPerSegment = EnergyAmountChangedData.NewValue / EnergyPerSegment;
 	const int32 SegmentToUpdateIndex = FMath::Floor(NewEnergyDivEnergyPerSegment);
 	const float SegmentToUpdateProgress = FMath::Frac(NewEnergyDivEnergyPerSegment);
 
@@ -64,7 +64,7 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 {
 	SegmentsList->ClearListItems();
 
-	const int32 EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
+	const float EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
 	bool bFoundUnfilledBarSegment = false;
 	for (int i = 0; i < EnergyAmountChangedData.NewMaxAmmo; i++)
 	{
@@ -79,7 +79,7 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 				}
 				else
 				{
-					SegmentProgress = FMath::Frac((EnergyAmountChangedData.CurrentEnergy - EnergyPerSegment * i) / static_cast<float>(EnergyPerSegment));
+					SegmentProgress = FMath::Frac((EnergyAmountChangedData.CurrentEnergy - EnergyPerSegment * i) / EnergyPerSegment);
 					bFoundUnfilledBarSegment = true;
 				}
 			}

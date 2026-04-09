@@ -65,7 +65,7 @@ void UShootingAttributeSet::PostAttributeChange(const FGameplayAttribute& Attrib
 			UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
 			GameplayMessageSubsystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_MaxAmmoAmountChanged_Message, MaxAmmoChangedData);
 				
-			UE_LOG(LogMLlikeGeneral, Warning, TEXT("New energy cost per shot - %d"), MaxAmmoChangedData.EnergyCostPerShot);
+			UE_LOG(LogMLlikeGeneral, Warning, TEXT("New energy cost per shot - %f"), MaxAmmoChangedData.EnergyCostPerShot);
 		}
 	}
 }
@@ -78,7 +78,7 @@ void UShootingAttributeSet::UpdateOutOfAmmo()
 		{
 			ASC->AddLooseGameplayTag(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo);
 		}
-		else if (GetEnergy() > GetEnergyCostPerShot())
+		else if (GetEnergy() >= GetEnergyCostPerShot())
 		{
 			ASC->RemoveLooseGameplayTag(MLlikeGameplayTags::TAG_MLlike_Ability_Shooting_OutOfAmmo);
 		}

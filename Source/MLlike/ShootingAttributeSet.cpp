@@ -46,7 +46,15 @@ void UShootingAttributeSet::PostAttributeChange(const FGameplayAttribute& Attrib
 		EnergyAmountChangedData.OldValue = OldValue;
 		EnergyAmountChangedData.NewValue = NewValue;
 		EnergyAmountChangedData.EnergyCostPerShot = GetEnergyCostPerShot();
-		
+		if (UAbilitySystemComponent* const ASC = GetOwningAbilitySystemComponent(); IsValid(ASC))
+		{
+			if (ASC->HasMatchingGameplayTag(MLlikeGameplayTags::TAG_ActionTaken_Shot))
+			{
+				EnergyAmountChangedData.ChangeReason = EEnergyAmountChangedReason::ShotFired;
+				ASC->RemoveLooseGameplayTag(MLlikeGameplayTags::TAG_ActionTaken_Shot);
+			}
+		}
+
 		UGameplayMessageSubsystem& GameplayMessageSubystem = UGameplayMessageSubsystem::Get(GetWorld());
 		GameplayMessageSubystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_EnergyAmountChanged_Message, EnergyAmountChangedData);
 	}

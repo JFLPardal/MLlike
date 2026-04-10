@@ -42,7 +42,7 @@ void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, con
 				}
 			}
 		}
-		else
+		else // energy decreased
 		{
 			for (int i = OldActiveSegmentIndex; i > SegmentToUpdateIndex; --i)
 			{
@@ -56,6 +56,17 @@ void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, con
 
 	if (UBarSegmentData* const SegmentToUpdateData = Cast<UBarSegmentData>(SegmentsList->GetItemAt(SegmentToUpdateIndex)); IsValid(SegmentToUpdateData))
 	{
+		if (EnergyAmountChangedData.ChangeReason == EEnergyAmountChangedReason::ShotFired)
+		{
+			if (UUserWidget* const SegmentToUpdateEntry = SegmentsList->GetEntryWidgetFromItem(SegmentToUpdateData); IsValid(SegmentToUpdateEntry))
+			{
+				FUIVFXInitData UIVFXInitData;
+				UIVFXInitData.Position = SegmentToUpdateEntry->GetPaintSpaceGeometry().GetAbsolutePosition();
+
+				OnPlayUIVFX.ExecuteIfBound(UIVFXInitData);
+			}
+		}
+
 		SegmentToUpdateData->SetBarSegmentProgress(SegmentToUpdateProgress);
 	}
 }
@@ -63,7 +74,6 @@ void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, con
 void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoChangedData& EnergyAmountChangedData)
 {
 	SegmentsList->ClearListItems();
-	SegmentsBox->ClearChildren();
 
 	const float EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
 	bool bFoundUnfilledBarSegment = false;
@@ -84,11 +94,8 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 					bFoundUnfilledBarSegment = true;
 				}
 			}
-			//BarSegmentData->SetBarSegmentProgress(SegmentProgress);
-			//SegmentsList->AddItem(BarSegmentData);
-
-			UMLlikeWidget* SegmentWidget = CreateWidget<UMLlikeWidget>(this, SegmentWidgetClass);
-			SegmentsBox->AddChild(SegmentWidget);
+			BarSegmentData->SetBarSegmentProgress(SegmentProgress);
+			SegmentsList->AddItem(BarSegmentData);
 		}
 		else
 		{

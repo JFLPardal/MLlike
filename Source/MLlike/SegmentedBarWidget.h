@@ -11,7 +11,17 @@
 struct FEnergyAmountChangedData;
 struct FMaxAmmoChangedData;
 class UListView;
-class UPanelWidget;
+
+USTRUCT(BlueprintType)
+struct FUIVFXInitData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector2f Position;
+};
+
+DECLARE_DYNAMIC_DELEGATE_OneParam(FPlayUIVFX, const FUIVFXInitData&, InitData);
 
 /**
  * 
@@ -20,6 +30,9 @@ UCLASS(MinimalAPI)
 class USegmentedBarWidget : public UMLlikeWidget
 {
 	GENERATED_BODY()
+
+public:
+	FPlayUIVFX OnPlayUIVFX;
 
 protected:
 	virtual void NativeOnInitialized() override;
@@ -36,12 +49,6 @@ private:
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UListView> SegmentsList;
-
-	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
-	TObjectPtr<UPanelWidget> SegmentsBox;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UMLlikeWidget> SegmentWidgetClass;
 
 private:
 	FGameplayMessageListenerHandle EnergyChangedHandle;

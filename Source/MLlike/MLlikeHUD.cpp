@@ -15,5 +15,5 @@ void UMLlikeHUD::NativeOnInitialized()
 
 void UMLlikeHUD::OnPlaySegmentDepletedUIVFX(const FUIVFXInitData& InitData)
 {
-	m_ParticleManagerWidget->PlayFromPosition(FVector2D{ InitData.Position.X, InitData.Position.Y });
+	m_ParticleManagerWidget->PlayFromPosition(InitData.Position);
 }

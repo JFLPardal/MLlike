@@ -10,16 +10,8 @@
 
 struct FEnergyAmountChangedData;
 struct FMaxAmmoChangedData;
+struct FUIVFXInitData;
 class UListView;
-
-USTRUCT(BlueprintType)
-struct FUIVFXInitData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadOnly)
-	FVector2f Position;
-};
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FPlayUIVFX, const FUIVFXInitData&, InitData);
 

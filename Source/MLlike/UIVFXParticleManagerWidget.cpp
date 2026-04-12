@@ -20,6 +20,8 @@ void UUIVFXParticleManagerWidget::PlayFromPosition(FVector2D InitialPosition)
 			{
 				if (UCanvasPanelSlot* const ParticleCanvasSlot = ParentAsCanvas->AddChildToCanvas(Particle); IsValid(ParticleCanvasSlot))
 				{
+					FVector2D CenterMiddleAlignment{ 0.5f, 0.5f };
+					ParticleCanvasSlot->SetAlignment(CenterMiddleAlignment);
 					ParticleCanvasSlot->SetPosition(InitialPosition);
 					ParticleCanvasSlot->SetAutoSize(true);
 				}

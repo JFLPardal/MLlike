@@ -9,6 +9,7 @@
 #include "MLlikeGameplayTags.h"
 #include "MLlikeLogCategories.h"
 #include "MLlikeUtils.h"
+#include "UIVFXInitData.h"
 
 
 void USegmentedBarWidget::NativeOnInitialized()
@@ -58,10 +59,10 @@ void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, con
 	{
 		if (EnergyAmountChangedData.ChangeReason == EEnergyAmountChangedReason::ShotFired)
 		{
-			if (UUserWidget* const SegmentToUpdateEntry = SegmentsList->GetEntryWidgetFromItem(SegmentToUpdateData); IsValid(SegmentToUpdateEntry))
+			if (UBarSegmentWidget* const SegmentToUpdateEntry = Cast<UBarSegmentWidget>(SegmentsList->GetEntryWidgetFromItem(SegmentToUpdateData)); IsValid(SegmentToUpdateEntry))
 			{
 				FUIVFXInitData UIVFXInitData;
-				UIVFXInitData.Position = SegmentToUpdateEntry->GetPaintSpaceGeometry().GetAbsolutePosition();
+				SegmentToUpdateEntry->PopulateVFXInitData(UIVFXInitData);
 
 				OnPlayUIVFX.ExecuteIfBound(UIVFXInitData);
 			}

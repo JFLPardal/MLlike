@@ -7,6 +7,7 @@
 #include "Blueprint/IUserObjectListEntry.h"
 #include "BarSegmentWidget.generated.h"
 
+struct FUIVFXInitData;
 class UWidgetAnimation;
 
 UCLASS(MinimalAPI)
@@ -33,6 +34,9 @@ UCLASS(MinimalAPI)
 class UBarSegmentWidget : public UMLlikeWidget, public IUserObjectListEntry
 {
 	GENERATED_BODY()
+
+public:
+	void PopulateVFXInitData(FUIVFXInitData& InitData) const;
 
 protected:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;

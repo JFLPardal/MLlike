@@ -11,5 +11,13 @@ struct FUIVFXInitData
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
-	FVector2D Position;
+	FVector2D AbsolutePosition;
+
+	/** can be limited by UUIVFXParticleManagerWidget's MinNumberOfParticles */
+	UPROPERTY(BlueprintReadOnly)
+	int32 MinNumberParticles = 1;
+
+	/** can be limited by UUIVFXParticleManagerWidget's MaxNumberOfParticles */
+	UPROPERTY(BlueprintReadOnly)
+	int32 MaxNumberParticles = 1;
 };

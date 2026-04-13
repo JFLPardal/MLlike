@@ -3,7 +3,6 @@
 
 #include "BarSegmentWidget.h"
 
-#include "Blueprint/SlateBlueprintLibrary.h"
 #include "Components/ProgressBar.h"
 #include "UIVFXInitData.h"
 
@@ -16,14 +15,13 @@ void UBarSegmentData::SetBarSegmentProgress(float NewProgress)
 
 void UBarSegmentWidget::PopulateVFXInitData(FUIVFXInitData& InitData) const
 {
-    FVector2D SegmentToSpawnFXPixelPosition, SegmentToSpawnFXViewportPosition;
     // position to spawn FX will be the absolute position of the segment + its width
     FVector2D SegmentToSpawnFXAbsolutePosition = GetPaintSpaceGeometry().GetAbsolutePosition();
     SegmentToSpawnFXAbsolutePosition.X += GetPaintSpaceGeometry().GetAbsoluteSize().X;
 
-    USlateBlueprintLibrary::AbsoluteToViewport(GetWorld(), SegmentToSpawnFXAbsolutePosition, SegmentToSpawnFXPixelPosition, SegmentToSpawnFXViewportPosition);
-
-    InitData.Position = SegmentToSpawnFXViewportPosition;
+    InitData.AbsolutePosition = SegmentToSpawnFXAbsolutePosition;
+    InitData.MinNumberParticles = m_MinNumberVFXParticles;
+    InitData.MaxNumberParticles = m_MaxNumberVFXParticles;
 }
 
 void UBarSegmentWidget::NativeOnListItemObjectSet(UObject* ListItemObject)

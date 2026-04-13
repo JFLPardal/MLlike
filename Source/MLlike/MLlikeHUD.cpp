@@ -5,6 +5,7 @@
 
 #include "SegmentedBarWidget.h"
 #include "UIVFXParticleManagerWidget.h"
+#include "UIVFXInitData.h"
 
 void UMLlikeHUD::NativeOnInitialized()
 {
@@ -15,5 +16,5 @@ void UMLlikeHUD::NativeOnInitialized()
 
 void UMLlikeHUD::OnPlaySegmentDepletedUIVFX(const FUIVFXInitData& InitData)
 {
-	m_ParticleManagerWidget->PlayFromPosition(InitData.Position);
+	m_ParticleManagerWidget->CreateParticlesAndPlay(InitData);
 }

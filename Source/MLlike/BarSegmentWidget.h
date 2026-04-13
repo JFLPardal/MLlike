@@ -44,11 +44,17 @@ protected:
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Setup)
 	FLinearColor m_SegmentFullColor;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Setup)
 	FLinearColor m_SegmentNotFullColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Setup)
+	int32 m_MinNumberVFXParticles = 3;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Setup)
+	int32 m_MaxNumberVFXParticles = 3;
 
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> BarFullAnimation;

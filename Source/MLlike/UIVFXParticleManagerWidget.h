@@ -6,9 +6,8 @@
 #include "MLlikeWidget.h"
 #include "UIVFXParticleManagerWidget.generated.h"
 
-/**
- * 
- */
+struct FUIVFXInitData;
+
 UCLASS()
 class MLLIKE_API UUIVFXParticleManagerWidget : public UMLlikeWidget
 {
@@ -16,7 +15,7 @@ class MLLIKE_API UUIVFXParticleManagerWidget : public UMLlikeWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void PlayFromPosition(FVector2D InitialPosition);
+	void CreateParticlesAndPlay(const FUIVFXInitData& ParticlesInitData);
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -27,10 +26,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UMLlikeWidget> ParticleWidgetClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=2,UIMax=15, ClampMin=2, ClampMax=15))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (UIMin = 1, UIMax = 15, ClampMin = 1, ClampMax = 15))
 	int32 MinNumberOfParticles = 3;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (UIMin = 2, UIMax = 15, ClampMin = 2, ClampMax = 15))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (UIMin = 1, UIMax = 15, ClampMin = 1, ClampMax = 15))
 	int32 MaxNumberOfParticles = 4;
 
 };

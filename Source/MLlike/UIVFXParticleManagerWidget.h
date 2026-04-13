@@ -8,6 +8,19 @@
 
 struct FUIVFXInitData;
 
+USTRUCT()
+struct FUIVFXParticleManagerState
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FUIVFXInitData InitData;
+
+	int32 NumberOfParticlesToSpawn = 0;
+	
+	int32 NumberOfParticlesSpawned = 0;
+};
+
 UCLASS()
 class MLLIKE_API UUIVFXParticleManagerWidget : public UMLlikeWidget
 {
@@ -15,7 +28,7 @@ class MLLIKE_API UUIVFXParticleManagerWidget : public UMLlikeWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void CreateParticlesAndPlay(const FUIVFXInitData& ParticlesInitData);
+	void PlayParticles(const FUIVFXInitData& ParticlesInitData);
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -32,4 +45,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (UIMin = 1, UIMax = 15, ClampMin = 1, ClampMax = 15))
 	int32 MaxNumberOfParticles = 4;
 
+
+private:
+	void CreateParticle(const FUIVFXInitData& ParticlesInitData);
+	void CheckIfShouldSpawnParticleAndSpawnIt();
+
+private:
+	FTimerHandle CreateParticleTimerHandle;
+	FTimerManager* TimerManager;
+	FUIVFXParticleManagerState m_State;
 };
+

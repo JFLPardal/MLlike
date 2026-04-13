@@ -16,5 +16,5 @@ void UMLlikeHUD::NativeOnInitialized()
 
 void UMLlikeHUD::OnPlaySegmentDepletedUIVFX(const FUIVFXInitData& InitData)
 {
-	m_ParticleManagerWidget->CreateParticlesAndPlay(InitData);
+	m_ParticleManagerWidget->PlayParticles(InitData);
 }

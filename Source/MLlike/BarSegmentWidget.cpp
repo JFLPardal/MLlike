@@ -5,6 +5,16 @@
 
 #include "UIVFXInitData.h"
 
+void UBarSegmentWidget::Init(const FBarSegmentInitData& InitData)
+{
+    SetPadding(InitData.Padding);
+
+    if (InitData.EdgeDescription != EBarSegmentEdgeDescription::None)
+    {
+        BP_UpdateEdgeDescription(InitData.EdgeDescription);
+    }
+}
+
 void UBarSegmentWidget::PopulateVFXInitData(FUIVFXInitData& InitData) const
 {
     // position to spawn FX will be the absolute position of the segment + its width

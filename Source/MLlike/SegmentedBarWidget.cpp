@@ -77,7 +77,8 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 
 	const float EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
 	bool bFoundUnfilledBarSegment = false;
-	for (int i = 0; i < EnergyAmountChangedData.NewMaxAmmo; i++)
+	const int32 NewMaxAmmo = EnergyAmountChangedData.NewMaxAmmo;
+	for (int i = 0; i < NewMaxAmmo; i++)
 	{
 		float SegmentProgress = 0.0f;
 		if (!bFoundUnfilledBarSegment)
@@ -104,8 +105,16 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 				SegmentSlot->SetSize(Size);
 			}
 				
+			FBarSegmentInitData SegmentInitData;
+			SegmentInitData.Padding = PaddingPerSegment;
+			SegmentInitData.EdgeDescription = 
+				(i == 0 && NewMaxAmmo == 1) ? EBarSegmentEdgeDescription::Both :
+				(i == 0) ? EBarSegmentEdgeDescription::Left : 
+				(i == NewMaxAmmo - 1) ? EBarSegmentEdgeDescription::Right : 
+				EBarSegmentEdgeDescription::None;
+
+			BarSegment->Init(SegmentInitData);
 			BarSegment->SetProgress(SegmentProgress);
-			BarSegment->SetPadding(PaddingPerSegment);
 		}
 	}
 }

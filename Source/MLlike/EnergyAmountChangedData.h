@@ -5,6 +5,13 @@
 #include "CoreMinimal.h"
 #include "EnergyAmountChangedData.generated.h"
 
+UENUM()
+enum class EEnergyAmountChangedReason
+{
+	ShotFired,
+	Unassigned
+};
+
 USTRUCT(BlueprintType)
 struct FEnergyAmountChangedData
 {
@@ -18,4 +25,7 @@ struct FEnergyAmountChangedData
 
 	UPROPERTY()
 	float EnergyCostPerShot = -1.0f;
+
+	UPROPERTY()
+	EEnergyAmountChangedReason ChangeReason = EEnergyAmountChangedReason::Unassigned;
 };

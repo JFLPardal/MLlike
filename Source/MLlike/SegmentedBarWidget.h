@@ -4,13 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
+#include "Layout/Margin.h"
 #include "MLlikeWidget.h"
 
 #include "SegmentedBarWidget.generated.h"
 
 struct FEnergyAmountChangedData;
 struct FMaxAmmoChangedData;
-class UListView;
+struct FUIVFXInitData;
+class UBarSegmentWidget;
+class UHorizontalBox;
+
+DECLARE_DYNAMIC_DELEGATE_OneParam(FPlayUIVFX, const FUIVFXInitData&, InitData);
 
 /**
  * 
@@ -19,6 +24,9 @@ UCLASS(MinimalAPI)
 class USegmentedBarWidget : public UMLlikeWidget
 {
 	GENERATED_BODY()
+
+public:
+	FPlayUIVFX OnPlayUIVFX;
 
 protected:
 	virtual void NativeOnInitialized() override;
@@ -34,8 +42,13 @@ private:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
-	TObjectPtr<UListView> SegmentsList;
+	TObjectPtr<UHorizontalBox> SegmentsContainer;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UBarSegmentWidget> SegmentClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FMargin PaddingPerSegment;
 
 private:
 	FGameplayMessageListenerHandle EnergyChangedHandle;

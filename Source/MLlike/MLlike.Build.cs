@@ -21,6 +21,7 @@ public class MLlike : ModuleRules
 			"Niagara",
 			"UMG",
 			"Slate",
+			"SlateCore",
             "GameplayAbilities",
 			"GameplayTags",
 			"GameplayTasks",

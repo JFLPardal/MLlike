@@ -4,47 +4,37 @@
 
 #include "CoreMinimal.h"
 #include "MLlikeWidget.h"
-#include "Blueprint/IUserObjectListEntry.h"
 #include "BarSegmentWidget.generated.h"
 
+struct FUIVFXInitData;
 class UWidgetAnimation;
-
-UCLASS(MinimalAPI)
-class UBarSegmentData : public UObject
-{
-	GENERATED_BODY()
-
-	DECLARE_DELEGATE_TwoParams(FOnBarSegmentDataChanged, float /*OldProgress*/, float /*NewProgress*/);
-
-public:
-	FOnBarSegmentDataChanged OnBarSegmentDataChanged;
-
-	void SetBarSegmentProgress(float NewProgress);
-	float GetBarSegmentProgress() const { return m_Progress; }
-
-private:
-	float m_Progress = 0.0f;
-};
 
 /**
  * 
  */
 UCLASS(MinimalAPI)
-class UBarSegmentWidget : public UMLlikeWidget, public IUserObjectListEntry
+class UBarSegmentWidget : public UMLlikeWidget
 {
 	GENERATED_BODY()
 
-protected:
-	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
-	virtual void NativeDestruct() override;
+public:
+	void PopulateVFXInitData(FUIVFXInitData& InitData) const;
+
+	void SetProgress(float NewProgress);
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Setup)
 	FLinearColor m_SegmentFullColor;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Setup)
 	FLinearColor m_SegmentNotFullColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Setup)
+	int32 m_MinNumberVFXParticles = 3;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Setup)
+	int32 m_MaxNumberVFXParticles = 3;
 
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> BarFullAnimation;
@@ -53,5 +43,5 @@ protected:
 	void BP_OnProgressChanged(float NewProgress, bool bWasBarFull, bool bIsBarFull);
 
 private:
-	void OnBarSegmentDataChanged(float OldProgress, float NewProgress);
+	float m_Progress = 1.0f;
 };

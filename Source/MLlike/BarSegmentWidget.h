@@ -4,43 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "MLlikeWidget.h"
-#include "Blueprint/IUserObjectListEntry.h"
 #include "BarSegmentWidget.generated.h"
 
 struct FUIVFXInitData;
 class UWidgetAnimation;
 
-UCLASS(MinimalAPI)
-class UBarSegmentData : public UObject
-{
-	GENERATED_BODY()
-
-	DECLARE_DELEGATE_TwoParams(FOnBarSegmentDataChanged, float /*OldProgress*/, float /*NewProgress*/);
-
-public:
-	FOnBarSegmentDataChanged OnBarSegmentDataChanged;
-
-	void SetBarSegmentProgress(float NewProgress);
-	float GetBarSegmentProgress() const { return m_Progress; }
-
-private:
-	float m_Progress = 0.0f;
-};
-
 /**
  * 
  */
 UCLASS(MinimalAPI)
-class UBarSegmentWidget : public UMLlikeWidget, public IUserObjectListEntry
+class UBarSegmentWidget : public UMLlikeWidget
 {
 	GENERATED_BODY()
 
 public:
 	void PopulateVFXInitData(FUIVFXInitData& InitData) const;
 
-protected:
-	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
-	virtual void NativeDestruct() override;
+	void SetProgress(float NewProgress);
 
 protected:
 
@@ -63,5 +43,5 @@ protected:
 	void BP_OnProgressChanged(float NewProgress, bool bWasBarFull, bool bIsBarFull);
 
 private:
-	void OnBarSegmentDataChanged(float OldProgress, float NewProgress);
+	float m_Progress = 1.0f;
 };

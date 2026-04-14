@@ -3,7 +3,8 @@
 #include "SegmentedBarWidget.h"
 
 #include "BarSegmentWidget.h"
-#include "Components/ListView.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
 #include "EnergyAmountChangedData.h"
 #include "MaxAmmoChangedData.h"
 #include "MLlikeGameplayTags.h"
@@ -37,9 +38,10 @@ void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, con
 		{
 			for (int i = OldActiveSegmentIndex; i < SegmentToUpdateIndex; ++i)
 			{
-				if (UBarSegmentData* const SegmentToUpdateData = Cast<UBarSegmentData>(SegmentsList->GetItemAt(i)); IsValid(SegmentToUpdateData))
+
+				if (UBarSegmentWidget* const SegmentToUpdate = Cast<UBarSegmentWidget>(SegmentsContainer->GetChildAt(i)); IsValid(SegmentToUpdate))
 				{
-					SegmentToUpdateData->SetBarSegmentProgress(1.0f);
+					SegmentToUpdate->SetProgress(1.0f);
 				}
 			}
 		}
@@ -47,60 +49,63 @@ void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, con
 		{
 			for (int i = OldActiveSegmentIndex; i > SegmentToUpdateIndex; --i)
 			{
-				if (UBarSegmentData* const SegmentToUpdateData = Cast<UBarSegmentData>(SegmentsList->GetItemAt(i)); IsValid(SegmentToUpdateData))
+				if (UBarSegmentWidget* const SegmentToUpdate = Cast<UBarSegmentWidget>(SegmentsContainer->GetChildAt(i)); IsValid(SegmentToUpdate))
 				{
-					SegmentToUpdateData->SetBarSegmentProgress(0.0f);
+					SegmentToUpdate->SetProgress(0.0f);
 				}
 			}
 		}
 	}
-
-	if (UBarSegmentData* const SegmentToUpdateData = Cast<UBarSegmentData>(SegmentsList->GetItemAt(SegmentToUpdateIndex)); IsValid(SegmentToUpdateData))
+	
+	if (UBarSegmentWidget* const SegmentToUpdate = Cast<UBarSegmentWidget>(SegmentsContainer->GetChildAt(SegmentToUpdateIndex)); IsValid(SegmentToUpdate))
 	{
 		if (EnergyAmountChangedData.ChangeReason == EEnergyAmountChangedReason::ShotFired)
 		{
-			if (UBarSegmentWidget* const SegmentToUpdateEntry = Cast<UBarSegmentWidget>(SegmentsList->GetEntryWidgetFromItem(SegmentToUpdateData)); IsValid(SegmentToUpdateEntry))
-			{
-				FUIVFXInitData UIVFXInitData;
-				SegmentToUpdateEntry->PopulateVFXInitData(UIVFXInitData);
+			FUIVFXInitData UIVFXInitData;
+			SegmentToUpdate->PopulateVFXInitData(UIVFXInitData);
 
-				OnPlayUIVFX.ExecuteIfBound(UIVFXInitData);
-			}
+			OnPlayUIVFX.ExecuteIfBound(UIVFXInitData);
 		}
 
-		SegmentToUpdateData->SetBarSegmentProgress(SegmentToUpdateProgress);
+		SegmentToUpdate->SetProgress(SegmentToUpdateProgress);
 	}
 }
 
 void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoChangedData& EnergyAmountChangedData)
 {
-	SegmentsList->ClearListItems();
+	SegmentsContainer->ClearChildren();
 
 	const float EnergyPerSegment = EnergyAmountChangedData.EnergyCostPerShot;
 	bool bFoundUnfilledBarSegment = false;
 	for (int i = 0; i < EnergyAmountChangedData.NewMaxAmmo; i++)
 	{
-		if (UBarSegmentData* BarSegmentData = NewObject<UBarSegmentData>(this); IsValid(BarSegmentData))
+		float SegmentProgress = 0.0f;
+		if (!bFoundUnfilledBarSegment)
 		{
-			float SegmentProgress = 0.0f;
-			if (!bFoundUnfilledBarSegment)
+			if (EnergyAmountChangedData.CurrentEnergy >= (i + 1) * EnergyPerSegment)
 			{
-				if (EnergyAmountChangedData.CurrentEnergy >= (i + 1) * EnergyPerSegment)
-				{
-					SegmentProgress = 1.0f;
-				}
-				else
-				{
-					SegmentProgress = FMath::Frac((EnergyAmountChangedData.CurrentEnergy - EnergyPerSegment * i) / EnergyPerSegment);
-					bFoundUnfilledBarSegment = true;
-				}
+				SegmentProgress = 1.0f;
 			}
-			BarSegmentData->SetBarSegmentProgress(SegmentProgress);
-			SegmentsList->AddItem(BarSegmentData);
+			else
+			{
+				SegmentProgress = FMath::Frac((EnergyAmountChangedData.CurrentEnergy - EnergyPerSegment * i) / EnergyPerSegment);
+				bFoundUnfilledBarSegment = true;
+			}
 		}
-		else
+			
+		if (UBarSegmentWidget* const BarSegment = CreateWidget<UBarSegmentWidget>(this, SegmentClass); IsValid(BarSegment))
 		{
-			UE_LOG(LogMLlikeUI, Error, TEXT("%s - Could not create bar segment data to add to segment bar"), TEXT(__FUNCSIG__));
+			// ensure Segments' width changes with amount of Segments in SegmentsContainer. This makes it so that the SegmentsContainer will always have the same width, as in ML
+			if (UHorizontalBoxSlot* const SegmentSlot = SegmentsContainer->AddChildToHorizontalBox(BarSegment); IsValid(SegmentSlot))
+			{
+				FSlateChildSize Size;
+				Size.SizeRule = ESlateSizeRule::Fill;
+				Size.Value = 1.0f;
+				SegmentSlot->SetSize(Size);
+			}
+				
+			BarSegment->SetProgress(SegmentProgress);
+			BarSegment->SetPadding(PaddingPerSegment);
 		}
 	}
 }

@@ -72,8 +72,14 @@ protected:
 	void BP_UpdateEdgeDescription(EBarSegmentEdgeDescription Description);
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	void BP_UpdateFullColor(bool bIsBarFull);
+	void BP_UpdateFullColor();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_InitFillRelatedElements(bool bIsBarFull);
 	
 private:
 	float m_Progress = 1.0f;
+
+private:
+	bool IsBarFull() const;
 };

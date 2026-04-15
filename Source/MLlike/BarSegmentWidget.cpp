@@ -13,6 +13,8 @@ void UBarSegmentWidget::Init(const FBarSegmentInitData& InitData)
     {
         BP_UpdateEdgeDescription(InitData.EdgeDescription);
     }
+
+    UpdateFullColor(InitData.Color);
 }
 
 void UBarSegmentWidget::PopulateVFXInitData(FUIVFXInitData& InitData) const
@@ -35,4 +37,13 @@ void UBarSegmentWidget::SetProgress(float NewProgress)
     const bool bWasBarFull = FMath::IsNearlyEqual(OldProgress, 1.0f, UE_KINDA_SMALL_NUMBER);
 
     BP_OnProgressChanged(m_Progress, bWasBarFull, bIsBarFull);
+}
+
+void UBarSegmentWidget::UpdateFullColor(FLinearColor NewColor)
+{
+    m_SegmentFullColor = NewColor;
+    
+    const bool bIsBarFull = FMath::IsNearlyEqual(m_Progress, 1.0f, UE_KINDA_SMALL_NUMBER);
+
+    BP_UpdateFullColor(bIsBarFull);
 }

@@ -69,6 +69,17 @@ void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, con
 
 		SegmentToUpdate->SetProgress(SegmentToUpdateProgress);
 	}
+
+	const int32 NumberOfFullSegments = SegmentToUpdateIndex;
+	for (int i = 0; i < NumberOfFullSegments; ++i)
+	{
+		if (UBarSegmentWidget* const SegmentToUpdate = Cast<UBarSegmentWidget>(SegmentsContainer->GetChildAt(i)); IsValid(SegmentToUpdate))
+		{
+			// +1 because we want to prioritize SegmentColorB rather than A
+			const float ColorAlpha = static_cast<float>(i + 1) / NumberOfFullSegments;
+			SegmentToUpdate->UpdateFullColor(GetSegmentColor(ColorAlpha));
+		}
+	}
 }
 
 void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoChangedData& EnergyAmountChangedData)
@@ -104,19 +115,31 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 				Size.Value = 1.0f;
 				SegmentSlot->SetSize(Size);
 			}
-				
-			FBarSegmentInitData SegmentInitData;
-			SegmentInitData.Padding = PaddingPerSegment;
-			SegmentInitData.EdgeDescription = 
-				(i == 0 && NewMaxAmmo == 1) ? EBarSegmentEdgeDescription::Both :
-				(i == 0) ? EBarSegmentEdgeDescription::Left : 
-				(i == NewMaxAmmo - 1) ? EBarSegmentEdgeDescription::Right : 
-				EBarSegmentEdgeDescription::None;
+			
+			// PopulateSegmentInitData
+			{
+				FBarSegmentInitData SegmentInitData;
 
-			BarSegment->Init(SegmentInitData);
+				SegmentInitData.Padding = PaddingPerSegment;
+				SegmentInitData.EdgeDescription = 
+					(i == 0 && NewMaxAmmo == 1) ? EBarSegmentEdgeDescription::Both :
+					(i == 0) ? EBarSegmentEdgeDescription::Left : 
+					(i == NewMaxAmmo - 1) ? EBarSegmentEdgeDescription::Right : 
+					EBarSegmentEdgeDescription::None;
+				const float ColorAlpha = static_cast<float>(i) / NewMaxAmmo;
+				SegmentInitData.Color = GetSegmentColor(ColorAlpha);
+
+				BarSegment->Init(SegmentInitData);
+			}
+
 			BarSegment->SetProgress(SegmentProgress);
 		}
 	}
+}
+
+FLinearColor USegmentedBarWidget::GetSegmentColor(float RatioOfColors) const
+{
+	return FMath::Lerp(SegmentColorA, SegmentColorB, RatioOfColors);
 }
 
 void USegmentedBarWidget::NativeDestruct()

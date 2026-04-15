@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Math/Color.h"
 #include "MLlikeWidget.h"
 #include "BarSegmentWidget.generated.h"
 
@@ -27,6 +28,8 @@ struct FBarSegmentInitData
 	FMargin Padding;
 
 	EBarSegmentEdgeDescription EdgeDescription = EBarSegmentEdgeDescription::None;
+
+	FLinearColor Color;
 };
 /**
  * 
@@ -43,9 +46,11 @@ public:
 
 	void SetProgress(float NewProgress);
 
-protected:
+	void UpdateFullColor(FLinearColor NewColor);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Setup)
+protected:
+	// visible as SegmentedBarWidget is the one controlling this, based on the relative position of this segment to the others
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Setup)
 	FLinearColor m_SegmentFullColor;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Setup)
@@ -65,7 +70,10 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void BP_UpdateEdgeDescription(EBarSegmentEdgeDescription Description);
-
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_UpdateFullColor(bool bIsBarFull);
+	
 private:
 	float m_Progress = 1.0f;
 };

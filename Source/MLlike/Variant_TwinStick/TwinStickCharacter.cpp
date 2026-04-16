@@ -13,6 +13,9 @@
 #include "TwinStickProjectile.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "MLLikeAbilitySystemComponent.h"
+#include "MLlikeGameplayTags.h"
+#include "ShootingAttributeSet.h"
 
 ATwinStickCharacter::ATwinStickCharacter()
 {
@@ -44,6 +47,10 @@ ATwinStickCharacter::ATwinStickCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+
+	ASC = CreateDefaultSubobject< UMLLikeAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+
+	ShootingAttributeSet = CreateDefaultSubobject<UShootingAttributeSet>(TEXT("ShootingAttributeSet"));
 }
 
 void ATwinStickCharacter::BeginPlay()
@@ -52,6 +59,19 @@ void ATwinStickCharacter::BeginPlay()
 	
 	// update the items count
 	UpdateItems();
+
+	if (IsValid(ASC))
+	{
+		ASC->InitAbilityActorInfo(this, this);
+
+		// initialize ShootingAttributeSet's values
+		FGameplayEffectSpecHandle InitShootAttributesSpecHandle = ASC->MakeOutgoingSpec(ShootingAttributeSetInitGE,/*Level*/1.0f, ASC->MakeEffectContext());
+		if (InitShootAttributesSpecHandle.IsValid())
+		{
+			InitShootAttributesSpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_Shooting_MaxAmmo, MaxInitialAmmo);
+			ASC->ApplyGameplayEffectSpecToSelf(*InitShootAttributesSpecHandle.Data);
+		}
+	}
 }
 
 void ATwinStickCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -121,7 +141,7 @@ void ATwinStickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(StickAimAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::StickAim);
 		EnhancedInputComponent->BindAction(MouseAimAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::MouseAim);
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Dash);
-		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Shoot);
+		//EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Shoot);
 		EnhancedInputComponent->BindAction(AoEAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::AoEAttack);
 
 	}

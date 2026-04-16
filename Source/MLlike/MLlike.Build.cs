@@ -21,9 +21,11 @@ public class MLlike : ModuleRules
 			"Niagara",
 			"UMG",
 			"Slate",
+			"SlateCore",
             "GameplayAbilities",
 			"GameplayTags",
-			"GameplayTasks"
+			"GameplayTasks",
+            "GameplayMessageRuntime"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

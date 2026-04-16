@@ -7,6 +7,8 @@
 #include "GameFramework/PlayerController.h"
 #include "TwinStickCharacter.generated.h"
 
+class UMLLikeAbilitySystemComponent;
+class UShootingAttributeSet;
 class USpringArmComponent;
 class UCameraComponent;
 struct FInputActionValue;
@@ -14,6 +16,7 @@ class APlayerController;
 class UInputAction;
 class ATwinStickAoEAttack;
 class ATwinStickProjectile;
+class UGameplayEffect;
 
 /**
  *  A player-controlled character for a Twin Stick Shooter game
@@ -120,11 +123,22 @@ protected:
 	/** Timer to handle stick autofire */
 	FTimerHandle AutoFireTimer;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
+	TObjectPtr<UMLLikeAbilitySystemComponent> ASC;
+
+	UPROPERTY()
+	TObjectPtr<UShootingAttributeSet> ShootingAttributeSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=ShootingAttributeSet, meta=(UIMin=1, UIMax=10, ClampMin=1, ClampMax=10))
+	int32 MaxInitialAmmo = 4;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ShootingAttributeSet)
+	TSubclassOf<UGameplayEffect> ShootingAttributeSetInitGE = nullptr;
+
 public:
 	
 	/** Constructor */
 	ATwinStickCharacter();
-
 protected:
 
 	/** Gameplay Initialization */

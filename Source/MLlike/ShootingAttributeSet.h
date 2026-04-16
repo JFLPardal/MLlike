@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
+#include "CoreMinimal.h"
 #include "ShootingAttributeSet.generated.h"
 
 /**
@@ -22,16 +23,16 @@ public:
 
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData MaxAmmo;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData Energy;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData MaxEnergy;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData EnergyCostPerShot;
 
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, EnergyCostPerShot);

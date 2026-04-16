@@ -80,6 +80,8 @@ void USegmentedBarWidget::OnCurrentEnergyAmountChanged(FGameplayTag Channel, con
 			SegmentToUpdate->UpdateFullColor(GetSegmentColor(ColorAlpha));
 		}
 	}
+
+	UpdateSegmentsIfBarFullChanged(EnergyAmountChangedData);
 }
 
 void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoChangedData& EnergyAmountChangedData)
@@ -128,6 +130,7 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 					EBarSegmentEdgeDescription::None;
 				const float ColorAlpha = static_cast<float>(i) / NewMaxAmmo;
 				SegmentInitData.Color = GetSegmentColor(ColorAlpha);
+				SegmentInitData.ColorIfBarIsFull = SegmentColorB;
 
 				BarSegment->Init(SegmentInitData);
 			}
@@ -135,11 +138,41 @@ void USegmentedBarWidget::OnMaxAmmoChanged(FGameplayTag Channel, const FMaxAmmoC
 			BarSegment->SetProgress(SegmentProgress);
 		}
 	}
+
+	InformSegmentsIfBarFullOnInit(EnergyAmountChangedData.CurrentEnergy);
 }
 
 FLinearColor USegmentedBarWidget::GetSegmentColor(float RatioOfColors) const
 {
 	return FMath::Lerp(SegmentColorA, SegmentColorB, RatioOfColors);
+}
+
+void USegmentedBarWidget::UpdateSegmentsIfBarFullChanged(const FEnergyAmountChangedData& EnergyAmountChangedData)
+{
+	const bool bBarWasFullButNoLongerIs = FMath::IsNearlyEqual(EnergyAmountChangedData.OldValue, 100.0f, UE_KINDA_SMALL_NUMBER) && !FMath::IsNearlyEqual(EnergyAmountChangedData.NewValue, 100.0f, UE_KINDA_SMALL_NUMBER);
+	const bool bBarWasNotFullButIsNow = !FMath::IsNearlyEqual(EnergyAmountChangedData.OldValue, 100.0f, UE_KINDA_SMALL_NUMBER) && FMath::IsNearlyEqual(EnergyAmountChangedData.NewValue, 100.0f, UE_KINDA_SMALL_NUMBER);
+	if (bBarWasFullButNoLongerIs || bBarWasNotFullButIsNow)
+	{
+		for (UWidget* const SegmentAsWidget : SegmentsContainer->GetAllChildren())
+		{
+			if (UBarSegmentWidget* const Segment = Cast<UBarSegmentWidget>(SegmentAsWidget); IsValid(Segment))
+			{
+				Segment->BarFullStateChanged(/*bIsBarFull*/ bBarWasNotFullButIsNow ? true : false);
+			}
+		}
+	}	
+}
+
+void USegmentedBarWidget::InformSegmentsIfBarFullOnInit(float CurrentProgress)
+{
+	const bool bIsBarFull = FMath::IsNearlyEqual(CurrentProgress, 100.0f, UE_KINDA_SMALL_NUMBER);
+	for (UWidget* const SegmentAsWidget : SegmentsContainer->GetAllChildren())
+	{
+		if (UBarSegmentWidget* const Segment = Cast<UBarSegmentWidget>(SegmentAsWidget); IsValid(Segment))
+		{
+			Segment->BarFullStateChanged(/*bIsBarFull*/ bIsBarFull ? true : false);
+		}
+	}
 }
 
 void USegmentedBarWidget::NativeDestruct()

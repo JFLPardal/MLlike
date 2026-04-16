@@ -20,16 +20,22 @@ enum class EBarSegmentEdgeDescription : uint8
 	Both
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FBarSegmentInitData
 {
 	GENERATED_BODY()
 
+	UPROPERTY(BlueprintReadOnly)
 	FMargin Padding;
 
+	UPROPERTY(BlueprintReadOnly)
 	EBarSegmentEdgeDescription EdgeDescription = EBarSegmentEdgeDescription::None;
 
+	UPROPERTY(BlueprintReadOnly)
 	FLinearColor Color;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FLinearColor ColorIfBarIsFull;
 };
 /**
  * 
@@ -48,13 +54,11 @@ public:
 
 	void UpdateFullColor(FLinearColor NewColor);
 
-protected:
-	// visible as SegmentedBarWidget is the one controlling this, based on the relative position of this segment to the others
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Setup)
-	FLinearColor m_SegmentFullColor;
+	void BarFullStateChanged(bool bIsBarFull);
 
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Setup)
-	FLinearColor m_SegmentNotFullColor;
+	FLinearColor m_FillColor;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Setup)
 	int32 m_MinNumberVFXParticles = 3;
@@ -63,23 +67,26 @@ protected:
 	int32 m_MaxNumberVFXParticles = 3;
 
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> SegmentFullAnimation;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> BarFullAnimation;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void BP_OnProgressChanged(float NewProgress, bool bWasBarFull, bool bIsBarFull);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void BP_UpdateEdgeDescription(EBarSegmentEdgeDescription Description);
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	void BP_UpdateFullColor();
+	void BP_Init(const FBarSegmentInitData& InitData);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void BP_InitFillRelatedElements(bool bIsBarFull);
+	void BP_OnProgressChanged(float NewProgress, bool bWasSegmentFull, bool bIsSegmentFull);
+		
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_UpdateSegmentFullColor(FLinearColor NewColor);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_BarFullStateChanged(bool bIsBarFull);
 	
+	UFUNCTION(BlueprintCallable)
+	bool IsSegmentFull() const;
+
 private:
 	float m_Progress = 1.0f;
-
-private:
-	bool IsBarFull() const;
 };

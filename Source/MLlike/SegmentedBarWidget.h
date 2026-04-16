@@ -62,4 +62,7 @@ private:
 
 	//arg - RatioOfColors should be between [0.0f, 1.0f] and represents the ratio to blend SegmentColorA and B
 	FLinearColor GetSegmentColor(float RatioOfColors) const;
+
+	void InformSegmentsIfBarFullOnInit(float CurrentProgress);
+	void UpdateSegmentsIfBarFullChanged(const FEnergyAmountChangedData& EnergyAmountChangedData);
 };

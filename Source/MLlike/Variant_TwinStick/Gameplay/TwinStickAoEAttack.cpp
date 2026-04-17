@@ -65,7 +65,7 @@ void ATwinStickAoEAttack::TickAoE()
 		if (ATwinStickNPC* NPC = Cast<ATwinStickNPC>(Current))
 		{
 			// tell the NPC it's been hit
-			NPC->ProjectileImpact(FVector::ZeroVector);
+			//NPC->ProjectileImpact(FVector::ZeroVector);
 		}
 	}
 }

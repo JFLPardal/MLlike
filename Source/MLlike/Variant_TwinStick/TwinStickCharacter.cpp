@@ -262,7 +262,10 @@ void ATwinStickCharacter::DoShoot()
 	FVector ProjectileLocation = ProjectileTransform.GetLocation() + ProjectileTransform.GetRotation().RotateVector(FVector::ForwardVector * ProjectileOffset);
 	ProjectileTransform.SetLocation(ProjectileLocation);
 
-	ATwinStickProjectile* Projectile = GetWorld()->SpawnActor<ATwinStickProjectile>(ProjectileClass, ProjectileTransform);
+	if (ATwinStickProjectile* Projectile = GetWorld()->SpawnActor<ATwinStickProjectile>(ProjectileClass, ProjectileTransform); IsValid(Projectile))
+	{
+		Projectile->SetOwnerASC(ASC);
+	}
 }
 
 void ATwinStickCharacter::DoAoEAttack()

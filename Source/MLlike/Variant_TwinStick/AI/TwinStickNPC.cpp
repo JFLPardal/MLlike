@@ -2,15 +2,18 @@
 
 
 #include "TwinStickNPC.h"
+
+#include "BaseHealthAttributeSet.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "TwinStickCharacter.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "TwinStickGameMode.h"
-#include "TwinStickPickup.h"
 #include "Engine/World.h"
-#include "TwinStickNPCDestruction.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "MLLikeAbilitySystemComponent.h"
 #include "TimerManager.h"
+#include "TwinStickCharacter.h"
+#include "TwinStickGameMode.h"
+#include "TwinStickNPCDestruction.h"
+#include "TwinStickPickup.h"
 
 ATwinStickNPC::ATwinStickNPC()
 {
@@ -37,6 +40,13 @@ ATwinStickNPC::ATwinStickNPC()
 	GetCharacterMovement()->AvoidanceWeight = 1.0f;
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+
+	m_ASC = CreateDefaultSubobject<UMLLikeAbilitySystemComponent>(TEXT("ASC"));
+
+	UBaseHealthAttributeSet* BaseHealthAttributeSet = NewObject<UBaseHealthAttributeSet>(this, TEXT("BaseHealthAttributeSet"));
+	m_ASC->AddAttributeSetSubobject<UBaseHealthAttributeSet>(BaseHealthAttributeSet);
+
+	m_ASC->GetGameplayAttributeValueChangeDelegate(BaseHealthAttributeSet->GetCurrentHealthAttribute()).AddUObject(this, &ATwinStickNPC::OnCurrentHealthChanged);
 }
 
 void ATwinStickNPC::BeginPlay()
@@ -49,6 +59,15 @@ void ATwinStickNPC::BeginPlay()
 		GM->IncreaseNPCs();
 	}
 
+	m_ASC->InitAbilityActorInfo(this, this);
+}
+
+void ATwinStickNPC::OnCurrentHealthChanged(const FOnAttributeChangeData& Data)
+{
+	if (Data.NewValue <= 0)
+	{
+		Killed();
+	}
 }
 
 void ATwinStickNPC::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -80,7 +99,7 @@ void ATwinStickNPC::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, 
 	}
 }
 
-void ATwinStickNPC::ProjectileImpact(const FVector& ForwardVector)
+void ATwinStickNPC::Killed()
 {
 	// only handle damage if we haven't been hit yet
 	if (bHit)

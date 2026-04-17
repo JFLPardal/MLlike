@@ -8,6 +8,8 @@
 
 class ATwinStickPickup;
 class ATwinStickNPCDestruction;
+struct FOnAttributeChangeData;
+class UMLLikeAbilitySystemComponent;
 
 /**
  *  A simple enemy NPC for a Twin Stick Shooter game
@@ -41,6 +43,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Pickup", meta=(ClampMin = 0, ClampMax = 5, Units = "s"))
 	float DeferredDestructionTime = 0.1f;
 
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UMLLikeAbilitySystemComponent> m_ASC = nullptr;
+
 	/** Deferred destruction timer */
 	FTimerHandle DestructionTimer;
 
@@ -72,10 +77,14 @@ protected:
 public:
 
 	/** Tells the NPC to process a projectile impact */
-	void ProjectileImpact(const FVector& ForwardVector);
+	void Killed();
 
 protected:
 
 	/** Called from timer to complete the destruction process for this NPC */
 	void DeferredDestroy();
+
+private:
+
+	void OnCurrentHealthChanged(const FOnAttributeChangeData& Data);
 };

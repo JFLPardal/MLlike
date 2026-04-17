@@ -7,6 +7,8 @@
 #include "AttributeSet.h"
 #include "BaseHealthAttributeSet.generated.h"
 
+class UGameplayMessageSubsystem;
+
 /**
  * 
  */
@@ -20,6 +22,9 @@ public:
 
 	ATTRIBUTE_ACCESSORS_BASIC(UBaseHealthAttributeSet, MaxHealth);
 	ATTRIBUTE_ACCESSORS_BASIC(UBaseHealthAttributeSet, CurrentHealth);
+
+protected:
+	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)

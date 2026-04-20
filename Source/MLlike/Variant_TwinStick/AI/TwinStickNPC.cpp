@@ -6,8 +6,10 @@
 #include "BaseHealthAttributeSet.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "HealthBarWidget.h"
 #include "MLLikeAbilitySystemComponent.h"
 #include "TimerManager.h"
 #include "TwinStickCharacter.h"
@@ -41,6 +43,9 @@ ATwinStickNPC::ATwinStickNPC()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
+	HealthBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	HealthBarWidgetComponent->SetupAttachment(GetMesh());
+
 	m_ASC = CreateDefaultSubobject<UMLLikeAbilitySystemComponent>(TEXT("ASC"));
 
 	UBaseHealthAttributeSet* BaseHealthAttributeSet = NewObject<UBaseHealthAttributeSet>(this, TEXT("BaseHealthAttributeSet"));
@@ -59,7 +64,28 @@ void ATwinStickNPC::BeginPlay()
 		GM->IncreaseNPCs();
 	}
 
-	m_ASC->InitAbilityActorInfo(this, this);
+	if (IsValid(HealthBarWidgetComponent))
+	{
+		HealthBarWidgetComponent->InitWidget();
+		if (UHealthBarWidget* Widget = Cast< UHealthBarWidget>(HealthBarWidgetComponent->GetWidget()); IsValid(Widget))
+		{
+			if(const UBaseHealthAttributeSet* const BaseHealthAttributeSet = Cast<UBaseHealthAttributeSet>(m_ASC->GetAttributeSet(UBaseHealthAttributeSet::StaticClass())); IsValid(BaseHealthAttributeSet))
+			{
+				FHealthBarInitData InitData;
+				InitData.m_ASC = m_ASC;
+				InitData.m_CurrentHealthAttribute = BaseHealthAttributeSet->GetCurrentHealthAttribute();
+				InitData.m_MaxHealth = BaseHealthAttributeSet->GetMaxHealth();
+				Widget->Init(InitData);
+			}
+		}
+
+		HealthBarWidgetComponent->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	}
+
+	if (IsValid(m_ASC))
+	{
+		m_ASC->InitAbilityActorInfo(this, this);
+	}
 }
 
 void ATwinStickNPC::OnCurrentHealthChanged(const FOnAttributeChangeData& Data)

@@ -10,6 +10,8 @@
 #include "MLlikeGameplayTags.h"
 #include "MLlikeLogCategories.h"
 
+static TAutoConsoleVariable<bool> CVarInfiniteAmmo(TEXT("ML.InfiniteAmmo"), true, TEXT("UI widget will not be updated while this is turned on"));
+
 UShootingAttributeSet::UShootingAttributeSet()
 {
 	// this is just a fallback - the true value is being specified in BP_TwinStickCharacter
@@ -25,7 +27,7 @@ void UShootingAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Att
 {
 	if (Attribute == GetEnergyAttribute())
 	{
-		NewValue = FMath::Clamp(NewValue, 0, GetMaxEnergy());
+		NewValue = CVarInfiniteAmmo.GetValueOnGameThread() ? GetMaxEnergy() : FMath::Clamp(NewValue, 0, GetMaxEnergy());
 	}
 	else if (Attribute == GetMaxAmmoAttribute())
 	{

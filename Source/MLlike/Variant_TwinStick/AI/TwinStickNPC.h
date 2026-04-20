@@ -10,6 +10,7 @@ class ATwinStickPickup;
 class ATwinStickNPCDestruction;
 struct FOnAttributeChangeData;
 class UMLLikeAbilitySystemComponent;
+class UWidgetComponent;
 
 /**
  *  A simple enemy NPC for a Twin Stick Shooter game
@@ -38,6 +39,9 @@ protected:
 	/** Type of destruction proxy to spawn on death */
 	UPROPERTY(EditAnywhere, Category="Destruction")
 	TSubclassOf<ATwinStickNPCDestruction> DestructionProxyClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UWidgetComponent> HealthBarWidgetComponent;
 
 	/** Time to wait after this NPC is hit before destroying it */
 	UPROPERTY(EditAnywhere, Category="Pickup", meta=(ClampMin = 0, ClampMax = 5, Units = "s"))

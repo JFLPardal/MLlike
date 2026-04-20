@@ -8,7 +8,7 @@
 UBaseHealthAttributeSet::UBaseHealthAttributeSet()
 {
 	// TODO move this
-	const float LocalMaxHealth = 2.0f;
+	const float LocalMaxHealth = 8.0f;
 	InitMaxHealth(LocalMaxHealth);
 	InitCurrentHealth(GetMaxHealth());
 }
@@ -20,7 +20,7 @@ void UBaseHealthAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& A
 	if (Attribute == GetCurrentHealthAttribute())
 	{
 		// TODO move this
-		const float LocalMaxHealth = 2.0f;
+		const float LocalMaxHealth = 8.0f;
 		NewValue = FMath::Clamp(NewValue, 0.0f, LocalMaxHealth);
 	}
 }

@@ -17,8 +17,15 @@ class MLLIKE_API UShootingAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 
 public:
-	UShootingAttributeSet();
 
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, EnergyCostPerShot);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxAmmo);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, Energy);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxEnergy);
+
+	void InitDependentAttributes();
+
+protected:
 	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
 
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
@@ -34,11 +41,6 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData EnergyCostPerShot;
-
-	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, EnergyCostPerShot);
-	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxAmmo);
-	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, Energy);
-	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxEnergy);
 
 private:
 	void UpdateOutOfAmmo();

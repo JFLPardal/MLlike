@@ -3,12 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "TwinStickNPC.generated.h"
 
+class UBaseHealthAttributeSet;
 class ATwinStickPickup;
 class ATwinStickNPCDestruction;
 struct FOnAttributeChangeData;
+class UGameplayEffect;
 class UMLLikeAbilitySystemComponent;
 class UWidgetComponent;
 
@@ -18,7 +21,7 @@ class UWidgetComponent;
  *  Awards points and randomly spawns pickups on death
  */
 UCLASS(abstract)
-class ATwinStickNPC : public ACharacter
+class ATwinStickNPC : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -53,6 +56,15 @@ protected:
 	/** Deferred destruction timer */
 	FTimerHandle DestructionTimer;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthAttributeSet, meta = (ClampMin = 1, ClampMax = 1000))
+	float m_MaxInitialHealth = 5;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthAttributeSet)
+	TSubclassOf<UGameplayEffect> m_HealthAttributeSetInitGE = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBaseHealthAttributeSet> m_HealthAttributeSet = nullptr;
+
 public:
 
 	/** If true, this NPC has already been hit by a projectile and is being destroyed. Exposed to BP so it can be read by StateTree */
@@ -63,6 +75,8 @@ public:
 
 	/** Constructor */
 	ATwinStickNPC();
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
 

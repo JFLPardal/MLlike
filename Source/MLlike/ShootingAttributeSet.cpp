@@ -12,15 +12,10 @@
 
 static TAutoConsoleVariable<bool> CVarInfiniteAmmo(TEXT("ML.InfiniteAmmo"), true, TEXT("UI widget will not be updated while this is turned on"));
 
-UShootingAttributeSet::UShootingAttributeSet()
+void UShootingAttributeSet::InitDependentAttributes()
 {
-	// this is just a fallback - the true value is being specified in BP_TwinStickCharacter
-	InitMaxAmmo(5);
-
-	// this value should NEVER change. If we want more bullets, increasing MaxAmmo will adjust the cost of each shot so that we have more shots per same amount of energy
-	InitMaxEnergy(100);
-	InitEnergy(GetMaxEnergy());
-	InitEnergyCostPerShot(FMath::DivideAndRoundDown(GetMaxEnergy(), GetMaxAmmo()));
+	SetEnergy(GetMaxEnergy());
+	SetEnergyCostPerShot(FMath::DivideAndRoundDown(GetMaxEnergy(), GetMaxAmmo()));
 }
 
 void UShootingAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
@@ -60,23 +55,18 @@ void UShootingAttributeSet::PostAttributeChange(const FGameplayAttribute& Attrib
 		UGameplayMessageSubsystem& GameplayMessageSubystem = UGameplayMessageSubsystem::Get(GetWorld());
 		GameplayMessageSubystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_EnergyAmountChanged_Message, EnergyAmountChangedData);
 	}
-	else
+	else if(Attribute == GetMaxAmmoAttribute())
 	{
-		if (Attribute == GetMaxAmmoAttribute())
-		{
-			SetEnergyCostPerShot(FMath::DivideAndRoundDown(GetMaxEnergy(), NewValue));
-				
-			UpdateOutOfAmmo();
+		SetEnergyCostPerShot(FMath::DivideAndRoundDown(GetMaxEnergy(), GetMaxAmmo()));
 
-			FMaxAmmoChangedData MaxAmmoChangedData;
-			MaxAmmoChangedData.CurrentEnergy = GetEnergy();
-			MaxAmmoChangedData.NewMaxAmmo = NewValue;
-			MaxAmmoChangedData.EnergyCostPerShot = GetEnergyCostPerShot();
-			UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
-			GameplayMessageSubsystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_MaxAmmoAmountChanged_Message, MaxAmmoChangedData);
-				
-			UE_LOG(LogMLlikeGeneral, Warning, TEXT("New energy cost per shot - %f"), MaxAmmoChangedData.EnergyCostPerShot);
-		}
+		UpdateOutOfAmmo();
+
+		FMaxAmmoChangedData MaxAmmoChangedData;
+		MaxAmmoChangedData.CurrentEnergy = GetEnergy();
+		MaxAmmoChangedData.NewMaxAmmo = NewValue;
+		MaxAmmoChangedData.EnergyCostPerShot = GetEnergyCostPerShot();
+		UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
+		GameplayMessageSubsystem.BroadcastMessage(MLlikeGameplayTags::TAG_MLlike_MaxAmmoAmountChanged_Message, MaxAmmoChangedData);
 	}
 }
 

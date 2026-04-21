@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerController.h"
 #include "TwinStickCharacter.generated.h"
@@ -24,7 +25,7 @@ class UGameplayEffect;
  *  Fires projectiles and spawns AoE attacks.
  */
 UCLASS(abstract)
-class ATwinStickCharacter : public ACharacter
+class ATwinStickCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -132,6 +133,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=ShootingAttributeSet, meta=(UIMin=1, UIMax=10, ClampMin=1, ClampMax=10))
 	int32 MaxInitialAmmo = 4;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ShootingAttributeSet, meta = (UIMin = 1, UIMax = 200, ClampMin = 1, ClampMax = 200))
+	int32 MaxInitialEnergy = 100;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ShootingAttributeSet)
 	TSubclassOf<UGameplayEffect> ShootingAttributeSetInitGE = nullptr;
 
@@ -139,6 +143,9 @@ public:
 	
 	/** Constructor */
 	ATwinStickCharacter();
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 protected:
 
 	/** Gameplay Initialization */

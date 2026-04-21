@@ -9,8 +9,10 @@
 #include "Components/WidgetComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameplayEffectTypes.h"
 #include "HealthBarWidget.h"
 #include "MLLikeAbilitySystemComponent.h"
+#include "MLlikeGameplayTags.h"
 #include "TimerManager.h"
 #include "TwinStickCharacter.h"
 #include "TwinStickGameMode.h"
@@ -48,10 +50,11 @@ ATwinStickNPC::ATwinStickNPC()
 
 	m_ASC = CreateDefaultSubobject<UMLLikeAbilitySystemComponent>(TEXT("ASC"));
 
-	UBaseHealthAttributeSet* BaseHealthAttributeSet = NewObject<UBaseHealthAttributeSet>(this, TEXT("BaseHealthAttributeSet"));
-	m_ASC->AddAttributeSetSubobject<UBaseHealthAttributeSet>(BaseHealthAttributeSet);
+	m_HealthAttributeSet = CreateDefaultSubobject<UBaseHealthAttributeSet>(TEXT("BaseHealthAttributeSet"));}
 
-	m_ASC->GetGameplayAttributeValueChangeDelegate(BaseHealthAttributeSet->GetCurrentHealthAttribute()).AddUObject(this, &ATwinStickNPC::OnCurrentHealthChanged);
+UAbilitySystemComponent* ATwinStickNPC::GetAbilitySystemComponent() const
+{
+	return m_ASC;
 }
 
 void ATwinStickNPC::BeginPlay()
@@ -64,27 +67,38 @@ void ATwinStickNPC::BeginPlay()
 		GM->IncreaseNPCs();
 	}
 
-	if (IsValid(HealthBarWidgetComponent))
-	{
-		HealthBarWidgetComponent->InitWidget();
-		if (UHealthBarWidget* Widget = Cast< UHealthBarWidget>(HealthBarWidgetComponent->GetWidget()); IsValid(Widget))
-		{
-			if(const UBaseHealthAttributeSet* const BaseHealthAttributeSet = Cast<UBaseHealthAttributeSet>(m_ASC->GetAttributeSet(UBaseHealthAttributeSet::StaticClass())); IsValid(BaseHealthAttributeSet))
-			{
-				FHealthBarInitData InitData;
-				InitData.m_ASC = m_ASC;
-				InitData.m_CurrentHealthAttribute = BaseHealthAttributeSet->GetCurrentHealthAttribute();
-				InitData.m_MaxHealth = BaseHealthAttributeSet->GetMaxHealth();
-				Widget->Init(InitData);
-			}
-		}
-
-		HealthBarWidgetComponent->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-	}
-
 	if (IsValid(m_ASC))
 	{
 		m_ASC->InitAbilityActorInfo(this, this);
+	
+		FGameplayEffectSpecHandle SpecHandle = m_ASC->MakeOutgoingSpec(m_HealthAttributeSetInitGE, 1.0f, m_ASC->MakeEffectContext());
+		SpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_BaseHealth_MaxHealth, m_MaxInitialHealth);
+		m_ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+
+		if(IsValid(m_HealthAttributeSet))
+		{
+			m_HealthAttributeSet->InitDependentAttributes();
+		}
+
+		m_ASC->GetGameplayAttributeValueChangeDelegate(m_HealthAttributeSet->GetCurrentHealthAttribute()).AddUObject(this, &ATwinStickNPC::OnCurrentHealthChanged);
+
+		if (IsValid(HealthBarWidgetComponent))
+		{
+			HealthBarWidgetComponent->InitWidget();
+			if (UHealthBarWidget* Widget = Cast<UHealthBarWidget>(HealthBarWidgetComponent->GetWidget()); IsValid(Widget))
+			{
+				if(IsValid(m_HealthAttributeSet))
+				{
+					FHealthBarInitData InitData;
+					InitData.m_ASC = m_ASC;
+					InitData.m_CurrentHealthAttribute = m_HealthAttributeSet->GetCurrentHealthAttribute();
+					InitData.m_MaxHealth = m_HealthAttributeSet->GetMaxHealth();
+					Widget->Init(InitData);
+				}
+			}
+
+			HealthBarWidgetComponent->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		}
 	}
 }
 

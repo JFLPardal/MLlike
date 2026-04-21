@@ -18,10 +18,10 @@ class MLLIKE_API UBaseHealthAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 	
 public:
-	UBaseHealthAttributeSet();
-
 	ATTRIBUTE_ACCESSORS_BASIC(UBaseHealthAttributeSet, MaxHealth);
 	ATTRIBUTE_ACCESSORS_BASIC(UBaseHealthAttributeSet, CurrentHealth);
+
+	void InitDependentAttributes();
 
 protected:
 	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;

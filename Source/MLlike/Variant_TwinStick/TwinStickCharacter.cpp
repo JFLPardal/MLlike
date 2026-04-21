@@ -53,6 +53,11 @@ ATwinStickCharacter::ATwinStickCharacter()
 	ShootingAttributeSet = CreateDefaultSubobject<UShootingAttributeSet>(TEXT("ShootingAttributeSet"));
 }
 
+UAbilitySystemComponent* ATwinStickCharacter::GetAbilitySystemComponent() const
+{
+	return ASC;
+}
+
 void ATwinStickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -63,13 +68,19 @@ void ATwinStickCharacter::BeginPlay()
 	if (IsValid(ASC))
 	{
 		ASC->InitAbilityActorInfo(this, this);
-
+		
 		// initialize ShootingAttributeSet's values
 		FGameplayEffectSpecHandle InitShootAttributesSpecHandle = ASC->MakeOutgoingSpec(ShootingAttributeSetInitGE,/*Level*/1.0f, ASC->MakeEffectContext());
 		if (InitShootAttributesSpecHandle.IsValid())
 		{
 			InitShootAttributesSpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_Shooting_MaxAmmo, MaxInitialAmmo);
+			InitShootAttributesSpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_Shooting_MaxEnergy, MaxInitialEnergy);
 			ASC->ApplyGameplayEffectSpecToSelf(*InitShootAttributesSpecHandle.Data);
+		}
+
+		if (IsValid(ShootingAttributeSet))
+		{
+			ShootingAttributeSet->InitDependentAttributes();
 		}
 	}
 }

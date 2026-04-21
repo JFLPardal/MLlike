@@ -5,12 +5,9 @@
 
 #include "GameFramework/GameplayMessageSubsystem.h"
 
-UBaseHealthAttributeSet::UBaseHealthAttributeSet()
+void UBaseHealthAttributeSet::InitDependentAttributes()
 {
-	// TODO move this
-	const float LocalMaxHealth = 8.0f;
-	InitMaxHealth(LocalMaxHealth);
-	InitCurrentHealth(GetMaxHealth());
+	SetCurrentHealth(GetMaxHealth());
 }
 
 void UBaseHealthAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
@@ -19,8 +16,6 @@ void UBaseHealthAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& A
 
 	if (Attribute == GetCurrentHealthAttribute())
 	{
-		// TODO move this
-		const float LocalMaxHealth = 8.0f;
-		NewValue = FMath::Clamp(NewValue, 0.0f, LocalMaxHealth);
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
 	}
 }

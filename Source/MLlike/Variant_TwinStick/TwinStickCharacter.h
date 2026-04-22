@@ -8,16 +8,17 @@
 #include "GameFramework/PlayerController.h"
 #include "TwinStickCharacter.generated.h"
 
+class APlayerController;
+class ATwinStickAoEAttack;
+class ATwinStickProjectile;
+struct FInputActionValue;
+class UAnimMontage;
+class UCameraComponent;
+class UGameplayEffect;
+class UInputAction;
 class UMLLikeAbilitySystemComponent;
 class UShootingAttributeSet;
 class USpringArmComponent;
-class UCameraComponent;
-struct FInputActionValue;
-class APlayerController;
-class UInputAction;
-class ATwinStickAoEAttack;
-class ATwinStickProjectile;
-class UGameplayEffect;
 
 /**
  *  A player-controlled character for a Twin Stick Shooter game
@@ -138,6 +139,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ShootingAttributeSet)
 	TSubclassOf<UGameplayEffect> ShootingAttributeSetInitGE = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAnimMontage> m_ComboAnimMontage = nullptr;
 
 public:
 	

@@ -154,6 +154,9 @@ void ATwinStickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Dash);
 		//EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Shoot);
 		EnhancedInputComponent->BindAction(AoEAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::AoEAttack);
+		const FTopLevelAssetPath EnumName("/Script/MLlike.EAbilityInputID");
+		FGameplayAbilityInputBinds InputBinds{ FString(""), FString(""),EnumName };
+		ASC->BindAbilityActivationToInputComponent(EnhancedInputComponent, InputBinds);
 
 	}
 
@@ -312,7 +315,7 @@ void ATwinStickCharacter::HandleDamage(float Damage, const FVector& DamageDirect
 	LaunchVector.Z = 0.0f;
 
 	// apply knockback to the character
-	LaunchCharacter(LaunchVector * KnockbackStrength, true, true);
+	//LaunchCharacter(LaunchVector * KnockbackStrength, true, true);
 
 	// pass control to BP
 	BP_Damaged();

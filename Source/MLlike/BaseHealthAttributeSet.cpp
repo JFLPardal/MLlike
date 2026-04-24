@@ -3,19 +3,28 @@
 
 #include "BaseHealthAttributeSet.h"
 
-#include "GameFramework/GameplayMessageSubsystem.h"
+#include "GameplayEffectExtension.h"
+
+UBaseHealthAttributeSet::UBaseHealthAttributeSet()
+{
+	InitDamage(0.0f);
+}
 
 void UBaseHealthAttributeSet::InitDependentAttributes()
 {
 	SetCurrentHealth(GetMaxHealth());
 }
 
-void UBaseHealthAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
+void UBaseHealthAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
-	Super::PreAttributeBaseChange(Attribute, NewValue);
+	Super::PostGameplayEffectExecute(Data);
 
-	if (Attribute == GetCurrentHealthAttribute())
+	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
-		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
+		if (!FMath::IsNearlyZero(GetDamage(), UE_KINDA_SMALL_NUMBER))
+		{
+			SetCurrentHealth(FMath::Clamp(GetCurrentHealth() - GetDamage(), 0.0f, GetMaxHealth()));
+			SetDamage(0.0f);
+		}
 	}
 }

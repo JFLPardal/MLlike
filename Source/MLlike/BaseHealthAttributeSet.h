@@ -20,16 +20,22 @@ class MLLIKE_API UBaseHealthAttributeSet : public UAttributeSet
 public:
 	ATTRIBUTE_ACCESSORS_BASIC(UBaseHealthAttributeSet, MaxHealth);
 	ATTRIBUTE_ACCESSORS_BASIC(UBaseHealthAttributeSet, CurrentHealth);
+	ATTRIBUTE_ACCESSORS_BASIC(UBaseHealthAttributeSet, Damage);
+
+	UBaseHealthAttributeSet();
 
 	void InitDependentAttributes();
 
 protected:
-	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData MaxHealth;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, meta=(HideFromModifiers))
 	FGameplayAttributeData CurrentHealth;
+
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData Damage;
 };

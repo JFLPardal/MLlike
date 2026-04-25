@@ -30,8 +30,8 @@ ATwinStickCharacter::ATwinStickCharacter()
 	SpringArm->TargetArmLength = 2200.0f;
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bInheritYaw = false;
-	SpringArm->bEnableCameraLag = true;
-	SpringArm->CameraLagSpeed = 0.5f;
+	SpringArm->bEnableCameraLag = false;
+	SpringArm->CameraLagSpeed = 0.1f;
 
 	// create the camera
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));

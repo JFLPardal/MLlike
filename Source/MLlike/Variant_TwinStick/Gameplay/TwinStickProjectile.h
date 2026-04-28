@@ -35,6 +35,7 @@ public:
 	/** Constructor */
 	ATwinStickProjectile();
 
+	UFUNCTION(BlueprintCallable)
 	void SetOwnerASC(UMLLikeAbilitySystemComponent* OwnerASC);
 	
 protected:

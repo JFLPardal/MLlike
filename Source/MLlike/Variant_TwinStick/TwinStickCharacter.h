@@ -73,7 +73,7 @@ protected:
 	float DashImpulse = 2500.0f;
 
 	/** Type of projectile to spawn when shooting */
-	UPROPERTY(EditAnywhere, Category="Projectile")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Projectile")
 	TSubclassOf<ATwinStickProjectile> ProjectileClass;
 
 	/** Distance ahead of the character that the projectile will be spawned at */

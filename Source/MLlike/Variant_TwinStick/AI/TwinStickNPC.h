@@ -3,11 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "TwinStickNPC.generated.h"
 
+class UBaseHealthAttributeSet;
 class ATwinStickPickup;
 class ATwinStickNPCDestruction;
+struct FOnAttributeChangeData;
+class UGameplayEffect;
+class UMLLikeAbilitySystemComponent;
+class UWidgetComponent;
 
 /**
  *  A simple enemy NPC for a Twin Stick Shooter game
@@ -15,7 +21,7 @@ class ATwinStickNPCDestruction;
  *  Awards points and randomly spawns pickups on death
  */
 UCLASS(abstract)
-class ATwinStickNPC : public ACharacter
+class ATwinStickNPC : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -37,12 +43,27 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Destruction")
 	TSubclassOf<ATwinStickNPCDestruction> DestructionProxyClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UWidgetComponent> HealthBarWidgetComponent;
+
 	/** Time to wait after this NPC is hit before destroying it */
 	UPROPERTY(EditAnywhere, Category="Pickup", meta=(ClampMin = 0, ClampMax = 5, Units = "s"))
 	float DeferredDestructionTime = 0.1f;
 
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UMLLikeAbilitySystemComponent> m_ASC = nullptr;
+
 	/** Deferred destruction timer */
 	FTimerHandle DestructionTimer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthAttributeSet, meta = (ClampMin = 1, ClampMax = 1000))
+	float m_MaxInitialHealth = 5;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthAttributeSet)
+	TSubclassOf<UGameplayEffect> m_HealthAttributeSetInitGE = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBaseHealthAttributeSet> m_HealthAttributeSet = nullptr;
 
 public:
 
@@ -54,6 +75,8 @@ public:
 
 	/** Constructor */
 	ATwinStickNPC();
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
 
@@ -72,10 +95,14 @@ protected:
 public:
 
 	/** Tells the NPC to process a projectile impact */
-	void ProjectileImpact(const FVector& ForwardVector);
+	void Killed();
 
 protected:
 
 	/** Called from timer to complete the destruction process for this NPC */
 	void DeferredDestroy();
+
+private:
+
+	void OnCurrentHealthChanged(const FOnAttributeChangeData& Data);
 };

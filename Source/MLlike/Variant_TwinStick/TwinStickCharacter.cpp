@@ -30,8 +30,8 @@ ATwinStickCharacter::ATwinStickCharacter()
 	SpringArm->TargetArmLength = 2200.0f;
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bInheritYaw = false;
-	SpringArm->bEnableCameraLag = true;
-	SpringArm->CameraLagSpeed = 0.5f;
+	SpringArm->bEnableCameraLag = false;
+	SpringArm->CameraLagSpeed = 0.1f;
 
 	// create the camera
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -53,6 +53,11 @@ ATwinStickCharacter::ATwinStickCharacter()
 	ShootingAttributeSet = CreateDefaultSubobject<UShootingAttributeSet>(TEXT("ShootingAttributeSet"));
 }
 
+UAbilitySystemComponent* ATwinStickCharacter::GetAbilitySystemComponent() const
+{
+	return ASC;
+}
+
 void ATwinStickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -63,13 +68,19 @@ void ATwinStickCharacter::BeginPlay()
 	if (IsValid(ASC))
 	{
 		ASC->InitAbilityActorInfo(this, this);
-
+		
 		// initialize ShootingAttributeSet's values
 		FGameplayEffectSpecHandle InitShootAttributesSpecHandle = ASC->MakeOutgoingSpec(ShootingAttributeSetInitGE,/*Level*/1.0f, ASC->MakeEffectContext());
 		if (InitShootAttributesSpecHandle.IsValid())
 		{
 			InitShootAttributesSpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_Shooting_MaxAmmo, MaxInitialAmmo);
+			InitShootAttributesSpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_Shooting_MaxEnergy, MaxInitialEnergy);
 			ASC->ApplyGameplayEffectSpecToSelf(*InitShootAttributesSpecHandle.Data);
+		}
+
+		if (IsValid(ShootingAttributeSet))
+		{
+			ShootingAttributeSet->InitDependentAttributes();
 		}
 	}
 }
@@ -143,6 +154,9 @@ void ATwinStickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Dash);
 		//EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Shoot);
 		EnhancedInputComponent->BindAction(AoEAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::AoEAttack);
+		const FTopLevelAssetPath EnumName("/Script/MLlike.EAbilityInputID");
+		FGameplayAbilityInputBinds InputBinds{ FString(""), FString(""),EnumName };
+		ASC->BindAbilityActivationToInputComponent(EnhancedInputComponent, InputBinds);
 
 	}
 
@@ -262,7 +276,10 @@ void ATwinStickCharacter::DoShoot()
 	FVector ProjectileLocation = ProjectileTransform.GetLocation() + ProjectileTransform.GetRotation().RotateVector(FVector::ForwardVector * ProjectileOffset);
 	ProjectileTransform.SetLocation(ProjectileLocation);
 
-	ATwinStickProjectile* Projectile = GetWorld()->SpawnActor<ATwinStickProjectile>(ProjectileClass, ProjectileTransform);
+	if (ATwinStickProjectile* Projectile = GetWorld()->SpawnActor<ATwinStickProjectile>(ProjectileClass, ProjectileTransform); IsValid(Projectile))
+	{
+		Projectile->SetOwnerASC(ASC);
+	}
 }
 
 void ATwinStickCharacter::DoAoEAttack()
@@ -298,7 +315,7 @@ void ATwinStickCharacter::HandleDamage(float Damage, const FVector& DamageDirect
 	LaunchVector.Z = 0.0f;
 
 	// apply knockback to the character
-	LaunchCharacter(LaunchVector * KnockbackStrength, true, true);
+	//LaunchCharacter(LaunchVector * KnockbackStrength, true, true);
 
 	// pass control to BP
 	BP_Damaged();

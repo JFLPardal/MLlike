@@ -3,20 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerController.h"
 #include "TwinStickCharacter.generated.h"
 
+class APlayerController;
+class ATwinStickAoEAttack;
+class ATwinStickProjectile;
+struct FInputActionValue;
+class UAnimMontage;
+class UCameraComponent;
+class UGameplayEffect;
+class UInputAction;
 class UMLLikeAbilitySystemComponent;
 class UShootingAttributeSet;
 class USpringArmComponent;
-class UCameraComponent;
-struct FInputActionValue;
-class APlayerController;
-class UInputAction;
-class ATwinStickAoEAttack;
-class ATwinStickProjectile;
-class UGameplayEffect;
 
 /**
  *  A player-controlled character for a Twin Stick Shooter game
@@ -24,7 +26,7 @@ class UGameplayEffect;
  *  Fires projectiles and spawns AoE attacks.
  */
 UCLASS(abstract)
-class ATwinStickCharacter : public ACharacter
+class ATwinStickCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -71,7 +73,7 @@ protected:
 	float DashImpulse = 2500.0f;
 
 	/** Type of projectile to spawn when shooting */
-	UPROPERTY(EditAnywhere, Category="Projectile")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Projectile")
 	TSubclassOf<ATwinStickProjectile> ProjectileClass;
 
 	/** Distance ahead of the character that the projectile will be spawned at */
@@ -132,13 +134,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=ShootingAttributeSet, meta=(UIMin=1, UIMax=10, ClampMin=1, ClampMax=10))
 	int32 MaxInitialAmmo = 4;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ShootingAttributeSet, meta = (UIMin = 1, UIMax = 200, ClampMin = 1, ClampMax = 200))
+	int32 MaxInitialEnergy = 100;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ShootingAttributeSet)
 	TSubclassOf<UGameplayEffect> ShootingAttributeSetInitGE = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAnimMontage> m_ComboAnimMontage = nullptr;
 
 public:
 	
 	/** Constructor */
 	ATwinStickCharacter();
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 protected:
 
 	/** Gameplay Initialization */

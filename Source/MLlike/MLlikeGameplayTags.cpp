@@ -9,6 +9,8 @@ namespace MLlikeGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(TAG_ActionTaken_Shot, "ActionTaken.Shot");
 
 	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Attribute_Shooting_MaxAmmo, "ShootingAttributeSet.MaxAmmo");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Attribute_Shooting_MaxEnergy, "ShootingAttributeSet.MaxEnergy");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Attribute_BaseHealth_MaxHealth, "BaseHealthAttributeSet.MaxHealth");
 
 	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_EnergyAmountChanged_Message, "EnergyAmmountChanged.Message");
 

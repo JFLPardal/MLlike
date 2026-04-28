@@ -2,9 +2,12 @@
 
 
 #include "TwinStickProjectile.h"
+
+#include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Components/StaticMeshComponent.h"
+#include "MLLikeAbilitySystemComponent.h"
+#include "MLlikeLogCategories.h"
 #include "TwinStickNPC.h"
 
 ATwinStickProjectile::ATwinStickProjectile()
@@ -37,25 +40,21 @@ ATwinStickProjectile::ATwinStickProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bRotationRemainsVertical = true;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
-	ProjectileMovement->bShouldBounce = true;
+	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->bForceSubStepping = true;
 
 	ProjectileMovement->OnProjectileStop.AddDynamic(this, &ATwinStickProjectile::OnProjectileStop);
 }
 
-void ATwinStickProjectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+void ATwinStickProjectile::SetOwnerASC(UMLLikeAbilitySystemComponent* OwnerASC)
 {
-	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-
-	// have we hit a NPC?
-	if (ATwinStickNPC* NPC = Cast<ATwinStickNPC>(Other))
+	if (!IsValid(OwnerASC))
 	{
-		// tell the NPC it's been hit
-		NPC->ProjectileImpact(FVector::ZeroVector);
-
-		// destroy this projectile
-		Destroy();
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Trying to set OwnerASC for %s with invalid pointer. This projectile will not behave as expected"), TEXT(__FUNCSIG__), *GetName());
+		return;
 	}
+
+	m_OwnerASC = OwnerASC;
 }
 
 void ATwinStickProjectile::OnProjectileStop(const FHitResult& ImpactResult)

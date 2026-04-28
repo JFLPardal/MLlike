@@ -6,10 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "TwinStickProjectile.generated.h"
 
+class UMLLikeAbilitySystemComponent;
 class USphereComponent;
 class UStaticMeshComponent;
 class UProjectileMovementComponent;
-
 /**
  *  A simple bouncing projectile for a Twin Stick shooter game
  */
@@ -35,11 +35,14 @@ public:
 	/** Constructor */
 	ATwinStickProjectile();
 
-	/** Handles collisions */
-	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+	UFUNCTION(BlueprintCallable)
+	void SetOwnerASC(UMLLikeAbilitySystemComponent* OwnerASC);
+	
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UMLLikeAbilitySystemComponent> m_OwnerASC;
 
 protected:
-	
 	/** Handles collisions that stop this projectile from moving */
 	UFUNCTION()
 	void OnProjectileStop(const FHitResult& ImpactResult);

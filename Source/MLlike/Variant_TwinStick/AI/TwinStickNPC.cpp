@@ -2,15 +2,22 @@
 
 
 #include "TwinStickNPC.h"
+
+#include "BaseHealthAttributeSet.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "TwinStickCharacter.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "TwinStickGameMode.h"
-#include "TwinStickPickup.h"
+#include "Components/WidgetComponent.h"
 #include "Engine/World.h"
-#include "TwinStickNPCDestruction.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameplayEffectTypes.h"
+#include "HealthBarWidget.h"
+#include "MLLikeAbilitySystemComponent.h"
+#include "MLlikeGameplayTags.h"
 #include "TimerManager.h"
+#include "TwinStickCharacter.h"
+#include "TwinStickGameMode.h"
+#include "TwinStickNPCDestruction.h"
+#include "TwinStickPickup.h"
 
 ATwinStickNPC::ATwinStickNPC()
 {
@@ -37,6 +44,17 @@ ATwinStickNPC::ATwinStickNPC()
 	GetCharacterMovement()->AvoidanceWeight = 1.0f;
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+
+	HealthBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	HealthBarWidgetComponent->SetupAttachment(GetMesh());
+
+	m_ASC = CreateDefaultSubobject<UMLLikeAbilitySystemComponent>(TEXT("ASC"));
+
+	m_HealthAttributeSet = CreateDefaultSubobject<UBaseHealthAttributeSet>(TEXT("BaseHealthAttributeSet"));}
+
+UAbilitySystemComponent* ATwinStickNPC::GetAbilitySystemComponent() const
+{
+	return m_ASC;
 }
 
 void ATwinStickNPC::BeginPlay()
@@ -49,6 +67,47 @@ void ATwinStickNPC::BeginPlay()
 		GM->IncreaseNPCs();
 	}
 
+	if (IsValid(m_ASC))
+	{
+		m_ASC->InitAbilityActorInfo(this, this);
+	
+		FGameplayEffectSpecHandle SpecHandle = m_ASC->MakeOutgoingSpec(m_HealthAttributeSetInitGE, 1.0f, m_ASC->MakeEffectContext());
+		SpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_BaseHealth_MaxHealth, m_MaxInitialHealth);
+		m_ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+
+		if(IsValid(m_HealthAttributeSet))
+		{
+			m_HealthAttributeSet->InitDependentAttributes();
+		}
+
+		m_ASC->GetGameplayAttributeValueChangeDelegate(m_HealthAttributeSet->GetCurrentHealthAttribute()).AddUObject(this, &ATwinStickNPC::OnCurrentHealthChanged);
+
+		if (IsValid(HealthBarWidgetComponent))
+		{
+			HealthBarWidgetComponent->InitWidget();
+			if (UHealthBarWidget* Widget = Cast<UHealthBarWidget>(HealthBarWidgetComponent->GetWidget()); IsValid(Widget))
+			{
+				if(IsValid(m_HealthAttributeSet))
+				{
+					FHealthBarInitData InitData;
+					InitData.m_ASC = m_ASC;
+					InitData.m_CurrentHealthAttribute = m_HealthAttributeSet->GetCurrentHealthAttribute();
+					InitData.m_MaxHealth = m_HealthAttributeSet->GetMaxHealth();
+					Widget->Init(InitData);
+				}
+			}
+
+			HealthBarWidgetComponent->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		}
+	}
+}
+
+void ATwinStickNPC::OnCurrentHealthChanged(const FOnAttributeChangeData& Data)
+{
+	if (Data.NewValue <= 0)
+	{
+		Killed();
+	}
 }
 
 void ATwinStickNPC::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -80,7 +139,7 @@ void ATwinStickNPC::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, 
 	}
 }
 
-void ATwinStickNPC::ProjectileImpact(const FVector& ForwardVector)
+void ATwinStickNPC::Killed()
 {
 	// only handle damage if we haven't been hit yet
 	if (bHit)

@@ -153,7 +153,7 @@ void ATwinStickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(MouseAimAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::MouseAim);
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Dash);
 		//EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Shoot);
-		EnhancedInputComponent->BindAction(AoEAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::AoEAttack);
+		//EnhancedInputComponent->BindAction(AoEAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::AoEAttack);
 		const FTopLevelAssetPath EnumName("/Script/MLlike.EAbilityInputID");
 		FGameplayAbilityInputBinds InputBinds{ FString(""), FString(""),EnumName };
 		ASC->BindAbilityActivationToInputComponent(EnhancedInputComponent, InputBinds);

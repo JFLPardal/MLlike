@@ -10,6 +10,8 @@
 #include "TwinStickNPC.h"
 #include "TwinStickGameMode.h"
 
+static TAutoConsoleVariable<bool> CVarEnableEnemySpawn(TEXT("ml.EnableEnemySpawn"), true, TEXT(""));
+
 ATwinStickSpawner::ATwinStickSpawner()
 {
  	PrimaryActorTick.bCanEverTick = true;
@@ -51,15 +53,19 @@ void ATwinStickSpawner::EndPlay(EEndPlayReason::Type EndPlayReason)
 
 void ATwinStickSpawner::SpawnNPCGroup()
 {
-	// reset the group spawn counter
-	SpawnCount = 0;
-
-	// check if we're still under the max NPC cap
-	if (ATwinStickGameMode* GM = Cast<ATwinStickGameMode>(GetWorld()->GetAuthGameMode()))
+	// doing this here instead of when the timer is set means we don't need to restart the game to enable the command
+	if (CVarEnableEnemySpawn.GetValueOnGameThread())
 	{
-		if (GM->CanSpawnNPCs())
+		// reset the group spawn counter
+		SpawnCount = 0;
+
+		// check if we're still under the max NPC cap
+		if (ATwinStickGameMode* GM = Cast<ATwinStickGameMode>(GetWorld()->GetAuthGameMode()))
 		{
-			SpawnNPC();
+			if (GM->CanSpawnNPCs())
+			{
+				SpawnNPC();
+			}
 		}
 	}
 }

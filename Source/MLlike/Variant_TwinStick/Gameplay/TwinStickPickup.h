@@ -29,8 +29,4 @@ public:
 
 	/** Constructor */
 	ATwinStickPickup();
-
-	/** Collision handling */
-	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
-
 };

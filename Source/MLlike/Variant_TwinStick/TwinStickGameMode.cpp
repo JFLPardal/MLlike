@@ -109,5 +109,5 @@ void ATwinStickGameMode::IncreaseNPCs()
 void ATwinStickGameMode::DecreaseNPCs()
 {
 	// decrease the NPC counter
-	--NPCCount;
+	NPCCount = FMath::Max(0, --NPCCount);
 }

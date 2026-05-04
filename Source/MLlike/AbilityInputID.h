@@ -10,5 +10,6 @@
 UENUM(BlueprintType)
 enum class EAbilityInputID : uint8
 {
-	MeleeAttack
+	MeleeAttack,
+	Shoot
 };

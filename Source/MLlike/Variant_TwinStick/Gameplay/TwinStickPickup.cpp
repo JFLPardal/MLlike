@@ -32,18 +32,3 @@ ATwinStickPickup::ATwinStickPickup()
 	Mesh->SetCollisionProfileName(FName("NoCollision"));
 
 }
-
-void ATwinStickPickup::NotifyActorBeginOverlap(AActor* OtherActor)
-{
-	Super::NotifyActorBeginOverlap(OtherActor);
-
-	// have we overlapped the player character?
-	if (ATwinStickCharacter* PlayerCharacter = Cast<ATwinStickCharacter>(OtherActor))
-	{
-		// give the pickup to the player
-		PlayerCharacter->AddPickup();
-
-		// destroy this pickup
-		Destroy();
-	}
-}

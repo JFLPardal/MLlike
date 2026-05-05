@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "MLlikeWidget.h"
+#include "UIVFXInitData.h"
 #include "UIVFXParticleManagerWidget.generated.h"
-
-struct FUIVFXInitData;
 
 USTRUCT()
 struct FUIVFXParticleManagerState

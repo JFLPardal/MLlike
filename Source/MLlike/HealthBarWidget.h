@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include "AttributeSet.h"
 #include "CoreMinimal.h"
 #include "MLlikeWidget.h"
 #include "HealthBarWidget.generated.h"
 
-struct FGameplayAttribute;
 struct FOnAttributeChangeData;
 class UMLLikeAbilitySystemComponent;
 

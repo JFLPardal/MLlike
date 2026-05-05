@@ -153,12 +153,6 @@ void ATwinStickNPC::Killed()
 	// deactivate character movement
 	GetCharacterMovement()->Deactivate();
 
-	// award points
-	if (ATwinStickGameMode* GM = Cast<ATwinStickGameMode>(GetWorld()->GetAuthGameMode()))
-	{
-		GM->ScoreUpdate(Score);
-	}
-
 	// randomly spawn a pickup
 	if (FMath::RandRange(0, 100) < PickupSpawnChance)
 	{

@@ -9,7 +9,6 @@
 #include "TwinStickCharacter.generated.h"
 
 class APlayerController;
-class ATwinStickAoEAttack;
 class ATwinStickProjectile;
 struct FInputActionValue;
 class UAnimMontage;
@@ -23,7 +22,7 @@ class USpringArmComponent;
 /**
  *  A player-controlled character for a Twin Stick Shooter game
  *  Automatically rotates to face the aim direction.
- *  Fires projectiles and spawns AoE attacks.
+ *  Fires projectiles.
  */
 UCLASS(abstract)
 class ATwinStickCharacter : public ACharacter, public IAbilitySystemInterface
@@ -60,10 +59,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ShootAction;
 
-	/** AoE attack input action */
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* AoEAction;
-
 	/** Trace channel to use for mouse aim */
 	UPROPERTY(EditAnywhere, Category="Input")
 	TEnumAsByte<ETraceTypeQuery> MouseAimTraceChannel;
@@ -80,28 +75,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Projectile", meta = (ClampMin = 0, ClampMax = 1000, Units = "cm"))
 	float ProjectileOffset = 100.0f;
 
-	/** Type of AoE attack actor to spawn */
-	UPROPERTY(EditAnywhere, Category="AoE")
-	TSubclassOf<ATwinStickAoEAttack> AoEAttackClass;
-
-	/** Number of starting AoE attack items */
-	UPROPERTY(EditAnywhere, Category="AoE")
-	int32 Items = 1;
-
 	/** Knockback impulse to apply to the character when they're damaged */
 	UPROPERTY(EditAnywhere, Category="Damage", meta = (ClampMin = 0, ClampMax = 1000, Units = "cm"))
 	float KnockbackStrength = 2500.0f;
 
-	/** Time to disallow AoE attacks after one is performed */
-	UPROPERTY(EditAnywhere, Category="AoE", meta = (ClampMin = 0, ClampMax = 10, Units = "s"))
-	float AoECooldownTime = 1.0f;
-
 	/** Speed to blend between our current rotation and the target aim rotation when stick aiming */
 	UPROPERTY(EditAnywhere, Category="Aim", meta = (ClampMin = 0, ClampMax = 100, Units = "s"))
 	float AimRotationInterpSpeed = 10.0f;
-
-	/** Game time of the last AoE attack */
-	float LastAoETime = 0.0f;
 
 	/** Aim Yaw Angle in degrees */
 	float AimAngle = 0.0f;
@@ -186,9 +166,6 @@ protected:
 	/** Shoots projectiles */
 	void Shoot(const FInputActionValue& Value);
 
-	/** Performs an AoE Attack */
-	void AoEAttack(const FInputActionValue& Value);
-
 public:
 
 	/** Handles move inputs from both input actions and touch interface */
@@ -207,10 +184,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	void DoShoot();
 
-	/** Handles aoe attack inputs from both input actions and touch interface */
-	UFUNCTION(BlueprintCallable, Category="Input")
-	void DoAoEAttack();
-
 public:
 
 	/** Applies collision impact to the player */
@@ -221,16 +194,6 @@ protected:
 	/** Allows Blueprint code to react to damage */
 	UFUNCTION(BlueprintImplementableEvent, Category="Damage", meta = (DisplayName = "Damaged"))
 	void BP_Damaged();
-
-public:
-
-	/** Gives the player a pickup item */
-	void AddPickup();
-
-protected:
-
-	/** Updates the items counter on the Game Mode */
-	void UpdateItems();
 
 	/** Resets stick the aim autofire flag after the autofire timer has expired */
 	void ResetAutoFire();

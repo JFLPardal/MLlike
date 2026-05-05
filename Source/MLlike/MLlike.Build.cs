@@ -32,12 +32,9 @@ public class MLlike : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] {
 			"MLlike",
-			"MLlike/Variant_Strategy",
-			"MLlike/Variant_Strategy/UI",
 			"MLlike/Variant_TwinStick",
 			"MLlike/Variant_TwinStick/AI",
 			"MLlike/Variant_TwinStick/Gameplay",
-			"MLlike/Variant_TwinStick/UI"
 		});
 
 		// Uncomment if you are using Slate UI

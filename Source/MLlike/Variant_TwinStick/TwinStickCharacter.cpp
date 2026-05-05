@@ -8,7 +8,6 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "TwinStickGameMode.h"
-#include "TwinStickAoEAttack.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "TwinStickProjectile.h"
 #include "Engine/World.h"
@@ -61,9 +60,6 @@ UAbilitySystemComponent* ATwinStickCharacter::GetAbilitySystemComponent() const
 void ATwinStickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	// update the items count
-	UpdateItems();
 
 	if (IsValid(ASC))
 	{
@@ -123,15 +119,14 @@ void ATwinStickCharacter::Tick(float DeltaTime)
 			// save the aim angle
 			AimAngle = AimRot.Yaw;
 
-			
-
 			// update the yaw, reuse the pitch and roll
 			SetActorRotation(FRotator(OldRotation.Pitch, AimAngle, OldRotation.Roll));
 
 		}
 
-	} else {
-
+	} 
+	else 
+	{
 		// use quaternion interpolation to blend between our current rotation
 		// and the desired aim rotation using the shortest path
 		const FRotator TargetRot = FRotator(OldRotation.Pitch, AimAngle, OldRotation.Roll);
@@ -147,19 +142,15 @@ void ATwinStickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	// set up the enhanced input action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Move);
 		EnhancedInputComponent->BindAction(StickAimAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::StickAim);
 		EnhancedInputComponent->BindAction(MouseAimAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::MouseAim);
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Dash);
-		//EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::Shoot);
-		//EnhancedInputComponent->BindAction(AoEAction, ETriggerEvent::Triggered, this, &ATwinStickCharacter::AoEAttack);
+
 		const FTopLevelAssetPath EnumName("/Script/MLlike.EAbilityInputID");
 		FGameplayAbilityInputBinds InputBinds{ FString(""), FString(""),EnumName };
 		ASC->BindAbilityActivationToInputComponent(EnhancedInputComponent, InputBinds);
-
 	}
-
 }
 
 void ATwinStickCharacter::Move(const FInputActionValue& Value)
@@ -202,12 +193,6 @@ void ATwinStickCharacter::Shoot(const FInputActionValue& Value)
 {
 	// route the input
 	DoShoot();
-}
-
-void ATwinStickCharacter::AoEAttack(const FInputActionValue& Value)
-{
-	// route the input
-	DoAoEAttack();
 }
 
 void ATwinStickCharacter::DoMove(float AxisX, float AxisY)
@@ -282,32 +267,6 @@ void ATwinStickCharacter::DoShoot()
 	}
 }
 
-void ATwinStickCharacter::DoAoEAttack()
-{
-	// do we have enough items to do an AoE attack?
-	if (Items > 0)
-	{
-		// get the game time
-		const float GameTime = GetWorld()->GetTimeSeconds();
-
-		// are we off AoE cooldown?
-		if (GameTime - LastAoETime > AoECooldownTime)
-		{
-			// save the new AoE time
-			LastAoETime = GameTime;
-
-			// spawn the AoE
-			ATwinStickAoEAttack* AoE = GetWorld()->SpawnActor<ATwinStickAoEAttack>(AoEAttackClass, GetActorTransform());
-
-			// decrease the number of items
-			--Items;
-
-			// update the items count
-			UpdateItems();
-		}
-	}
-}
-
 void ATwinStickCharacter::HandleDamage(float Damage, const FVector& DamageDirection)
 {
 	// calculate the knockback vector
@@ -319,24 +278,6 @@ void ATwinStickCharacter::HandleDamage(float Damage, const FVector& DamageDirect
 
 	// pass control to BP
 	BP_Damaged();
-}
-
-void ATwinStickCharacter::AddPickup()
-{
-	// increase the item count
-	++Items;
-
-	// update the items counter
-	UpdateItems();
-}
-
-void ATwinStickCharacter::UpdateItems()
-{
-	// update the game mode
-	if (ATwinStickGameMode* GM = Cast<ATwinStickGameMode>(GetWorld()->GetAuthGameMode()))
-	{
-		GM->ItemUsed(Items);
-	}
 }
 
 void ATwinStickCharacter::ResetAutoFire()

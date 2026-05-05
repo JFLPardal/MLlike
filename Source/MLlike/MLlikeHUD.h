@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Variant_TwinStick/UI/TwinStickUI.h"
+#include "Blueprint/UserWidget.h"
 #include "MLlikeHUD.generated.h"
 
 struct FUIVFXInitData;
@@ -14,7 +14,7 @@ class UUIVFXParticleManagerWidget;
  * 
  */
 UCLASS()
-class MLLIKE_API UMLlikeHUD : public UTwinStickUI
+class MLLIKE_API UMLlikeHUD : public UUserWidget
 {
 	GENERATED_BODY()
 	

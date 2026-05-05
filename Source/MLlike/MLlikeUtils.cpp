@@ -3,6 +3,7 @@
 #include "MLlikeUtils.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "TwinStickCharacter.h"
 
 namespace MLlikeUtils
 {

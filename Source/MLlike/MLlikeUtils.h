@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+class ATwinStickCharacter;
+
 namespace MLlikeUtils
 {
 	static ATwinStickCharacter* GetPlayerCharacter(const UObject* const World);

@@ -5,12 +5,13 @@
 
 #include "AbilitySystemComponent.h"
 #include "EnergyAmountChangedData.h"
+#include "Engine/World.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "MaxAmmoChangedData.h"
 #include "MLlikeGameplayTags.h"
 #include "MLlikeLogCategories.h"
 
-static TAutoConsoleVariable<bool> CVarInfiniteAmmo(TEXT("ML.InfiniteAmmo"), true, TEXT("UI widget will not be updated while this is turned on"));
+static TAutoConsoleVariable<bool> CVarInfiniteAmmo(TEXT("ML.InfiniteAmmo"), false, TEXT("UI widget will not be updated while this is turned on"));
 
 void UShootingAttributeSet::InitDependentAttributes()
 {

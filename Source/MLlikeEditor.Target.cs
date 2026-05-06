@@ -11,5 +11,11 @@ public class MLlikeEditorTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_6;
 		ExtraModuleNames.Add("MLlike");
-	}
+
+        bEnforceIWYU = true;
+		// change this to test with non unity builds and with relying on PCH
+		const bool bTestInclude = false;
+        bUseUnityBuild = bTestInclude ? false : true;
+        bUsePCHFiles = bTestInclude ? false : true;
+    }
 }

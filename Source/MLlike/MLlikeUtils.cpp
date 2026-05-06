@@ -5,6 +5,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "TwinStickCharacter.h"
 
+static TAutoConsoleVariable<bool> CVarHideTutorialHints(
+	TEXT("ML.HideTutorialHints"),
+	false,
+	TEXT("Hide tutorial helper actors")
+);
+
 namespace MLlikeUtils
 {
 	static ATwinStickCharacter* GetPlayerCharacter(const UObject* const World)

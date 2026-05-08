@@ -50,11 +50,17 @@ ATwinStickNPC::ATwinStickNPC()
 
 	m_ASC = CreateDefaultSubobject<UMLLikeAbilitySystemComponent>(TEXT("ASC"));
 
-	m_HealthAttributeSet = CreateDefaultSubobject<UBaseHealthAttributeSet>(TEXT("BaseHealthAttributeSet"));}
+	m_HealthAttributeSet = CreateDefaultSubobject<UBaseHealthAttributeSet>(TEXT("BaseHealthAttributeSet"));
+}
 
 UAbilitySystemComponent* ATwinStickNPC::GetAbilitySystemComponent() const
 {
 	return m_ASC;
+}
+
+UStateTree* const ATwinStickNPC::GetStateTree() const
+{
+	return StateTree;
 }
 
 void ATwinStickNPC::BeginPlay()

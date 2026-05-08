@@ -13,6 +13,7 @@ class ATwinStickNPCDestruction;
 struct FOnAttributeChangeData;
 class UGameplayEffect;
 class UMLLikeAbilitySystemComponent;
+class UStateTree;
 class UWidgetComponent;
 
 /**
@@ -50,11 +51,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Pickup", meta=(ClampMin = 0, ClampMax = 5, Units = "s"))
 	float DeferredDestructionTime = 0.1f;
 
+	/** Deferred destruction timer */
+	FTimerHandle DestructionTimer;
+	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UMLLikeAbilitySystemComponent> m_ASC = nullptr;
 
-	/** Deferred destruction timer */
-	FTimerHandle DestructionTimer;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=AI)
+	TObjectPtr<UStateTree> StateTree;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthAttributeSet, meta = (ClampMin = 1, ClampMax = 1000))
 	float m_MaxInitialHealth = 5;
@@ -77,6 +81,8 @@ public:
 	ATwinStickNPC();
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UStateTree* const GetStateTree() const;
 
 protected:
 

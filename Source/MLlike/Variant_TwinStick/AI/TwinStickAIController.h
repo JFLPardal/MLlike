@@ -7,6 +7,7 @@
 #include "TwinStickAIController.generated.h"
 
 class UStateTreeAIComponent;
+class UStateTree;
 
 /**
  *  A StateTree-Enabled AI Controller for a Twin Stick Shooter game
@@ -25,4 +26,10 @@ public:
 
 	/** Constructor */
 	ATwinStickAIController();
+
+protected:
+	virtual void OnPossess(APawn* InPawn) override;
+
+private:
+	void SetStateTree(UStateTree* const StateTree);
 };

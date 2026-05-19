@@ -63,6 +63,11 @@ UStateTree* const ATwinStickNPC::GetStateTree() const
 	return StateTree;
 }
 
+void ATwinStickNPC::SetEnemyDefinitionDataAsset(UEnemyDefinitionDataAsset* const DataAsset)
+{
+	m_DefinitionAsset = DataAsset;
+}
+
 void ATwinStickNPC::BeginPlay()
 {
 	Super::BeginPlay();

@@ -8,6 +8,8 @@
 #include "TwinStickSpawner.generated.h"
 
 class ARecastNavMesh;
+// TODO DELETE
+class UEnemyDefinitionDataAsset;
 
 /**
  *  A simple NPC spawner for a Twin Stick Shooter game
@@ -22,6 +24,10 @@ protected:
 	/** Type of NPC to spawn */
 	UPROPERTY(EditAnywhere, Category="NPC Spawner")
 	TArray<TSubclassOf<ATwinStickNPC>> NPCClass;
+
+	// TODO find a better solution for doing this
+	UPROPERTY(EditAnywhere, Category = "NPC Spawner")
+	TArray<TObjectPtr<UEnemyDefinitionDataAsset>> EnemyDefinitions;
 	
 	/** Time delay between enemy group spawns */
 	UPROPERTY(EditAnywhere, Category="NPC Spawner", meta = (ClampMin = 0, ClampMax = 20, Units = "s"))

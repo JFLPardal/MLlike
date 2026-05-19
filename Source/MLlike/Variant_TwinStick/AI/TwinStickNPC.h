@@ -8,6 +8,7 @@
 #include "TwinStickNPC.generated.h"
 
 class UBaseHealthAttributeSet;
+class UEnemyDefinitionDataAsset;
 class ATwinStickPickup;
 class ATwinStickNPCDestruction;
 struct FOnAttributeChangeData;
@@ -69,6 +70,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBaseHealthAttributeSet> m_HealthAttributeSet = nullptr;
 
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UEnemyDefinitionDataAsset> m_DefinitionAsset = nullptr;
 public:
 
 	/** If true, this NPC has already been hit by a projectile and is being destroyed. Exposed to BP so it can be read by StateTree */
@@ -83,6 +86,8 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UStateTree* const GetStateTree() const;
+
+	void SetEnemyDefinitionDataAsset(UEnemyDefinitionDataAsset* const DataAsset);
 
 protected:
 

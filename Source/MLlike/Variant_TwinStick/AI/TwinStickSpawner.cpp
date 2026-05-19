@@ -84,7 +84,16 @@ void ATwinStickSpawner::SpawnNPC()
 		const int32 Index = FMath::RandRange(0, FMath::Clamp(NPCClass.Num() - 1, 0, NPCClass.Num() - 1));
 		if (NPCClass.Num())
 		{
-			ATwinStickNPC* NPC = GetWorld()->SpawnActor<ATwinStickNPC>(NPCClass[Index], SpawnTransform);
+			ATwinStickNPC* NPC = GetWorld()->SpawnActorDeferred<ATwinStickNPC>(NPCClass[Index], SpawnTransform);
+			if (IsValid(NPC))
+			{
+				// TODO how to get these?
+				if (EnemyDefinitions.Num() > 0 && EnemyDefinitions[0].Get())
+				{
+					NPC->SetEnemyDefinitionDataAsset(EnemyDefinitions[0]);
+				}
+				NPC->FinishSpawning(NPC->GetTransform());
+			}
 		}
 	}
 

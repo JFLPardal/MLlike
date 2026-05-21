@@ -11,7 +11,6 @@ class UAnimMontage;
 class UMaterialInstance;
 class UStateTree;
 
-//TODO move to individual file, add include to MeleeAttackComponent
 /** struct to initialize MeleeAttackComponent */
 USTRUCT(BlueprintType)
 struct FMeleeAttackComponentConfig
@@ -26,7 +25,6 @@ public:
 	bool HasWindupAnim;
 };
 
-//TODO move to individual file, add include to MeleeAttackComponent
 /** struct to initialize ShootingAttackComponent */
 USTRUCT(BlueprintType)
 struct FShootingAttackComponentConfig
@@ -55,22 +53,28 @@ class MLLIKE_API UEnemyDefinitionDataAsset : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
+public:
+	float GetMaxInitialHealth() const;
+
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bHasMeleeAttack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="bHasMeleeAttack", EditConditionHides))
-	FMeleeAttackComponentConfig MeleeAttackComponentConfig;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bHasShootingAttack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "bHasShootingAttack", EditConditionHides))
-	FShootingAttackComponentConfig ShootingAttackComponentConfig;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UStateTree> StateTree;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> Material;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 1, ClampMax = 1000))
+	float MaxInitialHealth = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Behaviours)
+	bool bHasMeleeAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Behaviours, meta=(EditCondition="bHasMeleeAttack", EditConditionHides))
+	FMeleeAttackComponentConfig MeleeAttackComponentConfig;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Behaviours)
+	bool bHasShootingAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Behaviours, meta = (EditCondition = "bHasShootingAttack", EditConditionHides))
+	FShootingAttackComponentConfig ShootingAttackComponentConfig;
 };

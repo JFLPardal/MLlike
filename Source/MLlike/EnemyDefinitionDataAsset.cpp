@@ -3,3 +3,7 @@
 
 #include "EnemyDefinitionDataAsset.h"
 
+float UEnemyDefinitionDataAsset::GetMaxInitialHealth() const
+{
+	return MaxInitialHealth;
+}

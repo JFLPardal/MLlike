@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
+#include "EnemyDefinitionDataAsset.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayEffectTypes.h"
@@ -83,7 +84,7 @@ void ATwinStickNPC::BeginPlay()
 		m_ASC->InitAbilityActorInfo(this, this);
 	
 		FGameplayEffectSpecHandle SpecHandle = m_ASC->MakeOutgoingSpec(m_HealthAttributeSetInitGE, 1.0f, m_ASC->MakeEffectContext());
-		SpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_BaseHealth_MaxHealth, m_MaxInitialHealth);
+		SpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_BaseHealth_MaxHealth, (IsValid(m_DefinitionAsset)) ? m_DefinitionAsset->GetMaxInitialHealth() : 1);
 		m_ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 
 		if(IsValid(m_HealthAttributeSet))

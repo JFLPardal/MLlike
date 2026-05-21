@@ -60,9 +60,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=AI)
 	TObjectPtr<UStateTree> StateTree;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthAttributeSet, meta = (ClampMin = 1, ClampMax = 1000))
-	float m_MaxInitialHealth = 5;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthAttributeSet)
 	TSubclassOf<UGameplayEffect> m_HealthAttributeSetInitGE = nullptr;

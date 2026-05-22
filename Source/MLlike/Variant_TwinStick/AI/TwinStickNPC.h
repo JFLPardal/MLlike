@@ -8,11 +8,13 @@
 #include "TwinStickNPC.generated.h"
 
 class UBaseHealthAttributeSet;
+class UEnemyDefinitionDataAsset;
 class ATwinStickPickup;
 class ATwinStickNPCDestruction;
 struct FOnAttributeChangeData;
 class UGameplayEffect;
 class UMLLikeAbilitySystemComponent;
+class UStateTree;
 class UWidgetComponent;
 
 /**
@@ -50,14 +52,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Pickup", meta=(ClampMin = 0, ClampMax = 5, Units = "s"))
 	float DeferredDestructionTime = 0.1f;
 
+	/** Deferred destruction timer */
+	FTimerHandle DestructionTimer;
+	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UMLLikeAbilitySystemComponent> m_ASC = nullptr;
 
-	/** Deferred destruction timer */
-	FTimerHandle DestructionTimer;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthAttributeSet, meta = (ClampMin = 1, ClampMax = 1000))
-	float m_MaxInitialHealth = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=AI)
+	TObjectPtr<UStateTree> StateTree;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthAttributeSet)
 	TSubclassOf<UGameplayEffect> m_HealthAttributeSetInitGE = nullptr;
@@ -65,6 +67,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBaseHealthAttributeSet> m_HealthAttributeSet = nullptr;
 
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UEnemyDefinitionDataAsset> m_DefinitionAsset = nullptr;
 public:
 
 	/** If true, this NPC has already been hit by a projectile and is being destroyed. Exposed to BP so it can be read by StateTree */
@@ -77,6 +81,10 @@ public:
 	ATwinStickNPC();
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UStateTree* const GetStateTree() const;
+
+	void SetEnemyDefinitionDataAsset(UEnemyDefinitionDataAsset* const DataAsset);
 
 protected:
 

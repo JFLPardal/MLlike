@@ -2,6 +2,9 @@
 
 
 #include "TwinStickSpawner.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetRegistry/AssetData.h"
+#include "EnemyDefinitionDataAsset.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "NavigationSystem.h"
@@ -15,13 +18,15 @@ static TAutoConsoleVariable<bool> CVarEnableEnemySpawn(TEXT("ml.EnableEnemySpawn
 ATwinStickSpawner::ATwinStickSpawner()
 {
  	PrimaryActorTick.bCanEverTick = true;
-
+	
 }
 
 void ATwinStickSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	InitializeEnemyDefinitions();
+
 	// find the recast navmesh actor on the level
 	TArray<AActor*> ActorList;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARecastNavMesh::StaticClass(), ActorList);
@@ -80,11 +85,15 @@ void ATwinStickSpawner::SpawnNPC()
 	{
 		SpawnTransform.SetLocation(SpawnLoc);
 
-		// spawn the NPC
-		const int32 Index = FMath::RandRange(0, FMath::Clamp(NPCClass.Num() - 1, 0, NPCClass.Num() - 1));
-		if (NPCClass.Num())
+		ATwinStickNPC* NPC = GetWorld()->SpawnActorDeferred<ATwinStickNPC>(NPCClass, SpawnTransform);
+		if (IsValid(NPC))
 		{
-			ATwinStickNPC* NPC = GetWorld()->SpawnActor<ATwinStickNPC>(NPCClass[Index], SpawnTransform);
+			if (EnemyDefinitions.Num() > 0)
+			{
+				const int32 Index = FMath::RandRange(0, FMath::Clamp(EnemyDefinitions.Num() - 1, 0, EnemyDefinitions.Num() - 1));
+				NPC->SetEnemyDefinitionDataAsset(EnemyDefinitions[Index].LoadSynchronous());
+			}
+			NPC->FinishSpawning(NPC->GetTransform());
 		}
 	}
 
@@ -97,4 +106,18 @@ void ATwinStickSpawner::SpawnNPC()
 		GetWorld()->GetTimerManager().SetTimer(SpawnNPCTimer, this, &ATwinStickSpawner::SpawnNPC, FMath::RandRange(MinSpawnDelay, MaxSpawnDelay), false);
 	}
 
+}
+
+void ATwinStickSpawner::InitializeEnemyDefinitions()
+{
+	EnemyDefinitions.Empty();
+
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+	TArray<FAssetData> EnemyDefinitionAssets;
+	AssetRegistryModule.Get().GetAssetsByClass(UEnemyDefinitionDataAsset::StaticClass()->GetClassPathName(), EnemyDefinitionAssets);
+	for (const FAssetData& EnemyDefinitionAsset : EnemyDefinitionAssets)
+	{
+		EnemyDefinitions.Add(TSoftObjectPtr<UEnemyDefinitionDataAsset>(EnemyDefinitionAsset.ToSoftObjectPath()));
+	}
 }

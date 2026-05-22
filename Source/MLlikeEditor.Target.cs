@@ -13,7 +13,7 @@ public class MLlikeEditorTarget : TargetRules
 		ExtraModuleNames.Add("MLlike");
 
         bEnforceIWYU = true;
-		// change this to test with non unity builds and with relying on PCH
+		// change this to test with non unity builds and without relying on PCH
 		const bool bTestInclude = false;
         bUseUnityBuild = bTestInclude ? false : true;
         bUsePCHFiles = bTestInclude ? false : true;

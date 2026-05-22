@@ -3,7 +3,9 @@
 
 #include "MLlikeBlueprintUtils.h"
 
+#include "GameFramework/Actor.h"
 #include "MLlikeLogCategories.h"
+#include "UObject/Interface.h"
 
 UActorComponent* UMLlikeBlueprintUtils::GetActorsFirstInterfaceOfType(TSubclassOf<UInterface> Interface, AActor* const Actor)
 {

@@ -8,7 +8,6 @@
 #include "TwinStickSpawner.generated.h"
 
 class ARecastNavMesh;
-// TODO DELETE
 class UEnemyDefinitionDataAsset;
 
 /**
@@ -23,11 +22,9 @@ protected:
 
 	/** Type of NPC to spawn */
 	UPROPERTY(EditAnywhere, Category="NPC Spawner")
-	TArray<TSubclassOf<ATwinStickNPC>> NPCClass;
+	TSubclassOf<ATwinStickNPC> NPCClass;
 
-	// TODO find a better solution for doing this
-	UPROPERTY(EditAnywhere, Category = "NPC Spawner")
-	TArray<TObjectPtr<UEnemyDefinitionDataAsset>> EnemyDefinitions;
+	TArray<TSoftObjectPtr<UEnemyDefinitionDataAsset>> EnemyDefinitions;
 	
 	/** Time delay between enemy group spawns */
 	UPROPERTY(EditAnywhere, Category="NPC Spawner", meta = (ClampMin = 0, ClampMax = 20, Units = "s"))
@@ -81,5 +78,9 @@ protected:
 
 	/** Spawns an individual NPC */
 	void SpawnNPC();
+
+
+private:
+	void InitializeEnemyDefinitions();
 
 };

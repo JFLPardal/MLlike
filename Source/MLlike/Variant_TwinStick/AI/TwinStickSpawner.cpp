@@ -2,6 +2,9 @@
 
 
 #include "TwinStickSpawner.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetRegistry/AssetData.h"
+#include "EnemyDefinitionDataAsset.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "NavigationSystem.h"
@@ -15,13 +18,15 @@ static TAutoConsoleVariable<bool> CVarEnableEnemySpawn(TEXT("ml.EnableEnemySpawn
 ATwinStickSpawner::ATwinStickSpawner()
 {
  	PrimaryActorTick.bCanEverTick = true;
-
+	
 }
 
 void ATwinStickSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	InitializeEnemyDefinitions();
+
 	// find the recast navmesh actor on the level
 	TArray<AActor*> ActorList;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARecastNavMesh::StaticClass(), ActorList);
@@ -80,21 +85,15 @@ void ATwinStickSpawner::SpawnNPC()
 	{
 		SpawnTransform.SetLocation(SpawnLoc);
 
-		// spawn the NPC
-		if (NPCClass.Num())
+		ATwinStickNPC* NPC = GetWorld()->SpawnActorDeferred<ATwinStickNPC>(NPCClass, SpawnTransform);
+		if (IsValid(NPC))
 		{
-			// TODO simplify this
-			ATwinStickNPC* NPC = GetWorld()->SpawnActorDeferred<ATwinStickNPC>(NPCClass[0], SpawnTransform);
-			if (IsValid(NPC))
+			if (EnemyDefinitions.Num() > 0)
 			{
-				// TODO how to get these?
 				const int32 Index = FMath::RandRange(0, FMath::Clamp(EnemyDefinitions.Num() - 1, 0, EnemyDefinitions.Num() - 1));
-				if (EnemyDefinitions.Num() > 0 && EnemyDefinitions[Index].Get())
-				{
-					NPC->SetEnemyDefinitionDataAsset(EnemyDefinitions[Index]);
-				}
-				NPC->FinishSpawning(NPC->GetTransform());
+				NPC->SetEnemyDefinitionDataAsset(EnemyDefinitions[Index].LoadSynchronous());
 			}
+			NPC->FinishSpawning(NPC->GetTransform());
 		}
 	}
 
@@ -107,4 +106,18 @@ void ATwinStickSpawner::SpawnNPC()
 		GetWorld()->GetTimerManager().SetTimer(SpawnNPCTimer, this, &ATwinStickSpawner::SpawnNPC, FMath::RandRange(MinSpawnDelay, MaxSpawnDelay), false);
 	}
 
+}
+
+void ATwinStickSpawner::InitializeEnemyDefinitions()
+{
+	EnemyDefinitions.Empty();
+
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+	TArray<FAssetData> EnemyDefinitionAssets;
+	AssetRegistryModule.Get().GetAssetsByClass(UEnemyDefinitionDataAsset::StaticClass()->GetClassPathName(), EnemyDefinitionAssets);
+	for (const FAssetData& EnemyDefinitionAsset : EnemyDefinitionAssets)
+	{
+		EnemyDefinitions.Add(TSoftObjectPtr<UEnemyDefinitionDataAsset>(EnemyDefinitionAsset.ToSoftObjectPath()));
+	}
 }

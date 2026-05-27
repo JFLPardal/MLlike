@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "TwinStickGameMode.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnWaveCleared);
+
 class UMLlikeHUD;
 
 /**
@@ -36,7 +38,9 @@ public:
 
 	/** Gameplay initialization */
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	FOnWaveCleared OnWaveCleared;
 public:
 
 	/** Returns true if the number of NPCs is under the cap */
@@ -47,4 +51,9 @@ public:
 
 	/** Decreases the NPC count */
 	void DecreaseNPCs();
+
+private:
+	void HandleOnSpawnNextWave();
+
+	bool bCanSpawnNextWave = true;
 };

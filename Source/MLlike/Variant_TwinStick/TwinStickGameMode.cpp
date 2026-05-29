@@ -2,11 +2,11 @@
 
 
 #include "TwinStickGameMode.h"
-#include "MLlikeHUD.h"
 #include "Engine/World.h"
-#include "TimerManager.h"
-#include "Kismet/GameplayStatics.h"
 #include "RunDirectorSubsystem.h"
+#include "TimerManager.h"
+#include "UIRootWidget.h"
+#include "UISubsystem.h"
 
 void ATwinStickGameMode::BeginPlay()
 {
@@ -16,9 +16,10 @@ void ATwinStickGameMode::BeginPlay()
 		RunDirectorSubsystem->OnSpawnNextWave.BindUObject(this, &ATwinStickGameMode::HandleOnSpawnNextWave);
 	}
 
-	// create the UI widget and add it to the viewport
-	UIWidget = CreateWidget<UMLlikeHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), UIWidgetClass);
-	UIWidget->AddToViewport(0);
+	if (UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>(); IsValid(UISubsystem))
+	{
+		UISubsystem->InitializeUI(UIWidgetClass);
+	}
 }
 
 bool ATwinStickGameMode::CanSpawnNPCs()

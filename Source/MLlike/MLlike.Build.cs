@@ -25,7 +25,8 @@ public class MLlike : ModuleRules
             "GameplayAbilities",
 			"GameplayTags",
 			"GameplayTasks",
-            "GameplayMessageRuntime"
+            "GameplayMessageRuntime",
+            "CommonUI",
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

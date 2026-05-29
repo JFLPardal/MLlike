@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MLlikeWidget.h"
+#include "CommonActivatableWidget.h"
 #include "ChoiceScreenWidget.generated.h"
 
 
@@ -11,7 +11,7 @@
  * 
  */
 UCLASS()
-class MLLIKE_API UChoiceScreenWidget : public UMLlikeWidget
+class MLLIKE_API UChoiceScreenWidget : public UCommonActivatableWidget
 {
 	GENERATED_BODY()
 };

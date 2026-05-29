@@ -8,7 +8,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnWaveCleared);
 
-class UMLlikeHUD;
+class UUIRootWidget;
 
 /**
  *  Simple Game Mode for a Twin Stick Shooter game.
@@ -22,10 +22,7 @@ protected:
 
 	/** Type of UI Widget to spawn */
 	UPROPERTY(EditAnywhere, Category="Twin Stick")
-	TSubclassOf<UMLlikeHUD> UIWidgetClass;
-
-	/** Pointer to the spawned UI Widget */
-	TObjectPtr<UMLlikeHUD> UIWidget;
+	TSubclassOf<UUIRootWidget> UIWidgetClass;
 
 	/** Max number of NPCs to allow in the level at once */
 	UPROPERTY(EditAnywhere, Category="Twin Stick", meta=(ClampMin = 0, ClampMax = 100))

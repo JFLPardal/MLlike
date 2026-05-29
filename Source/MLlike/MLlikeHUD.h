@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "CommonActivatableWidget.h"
 #include "MLlikeHUD.generated.h"
 
 struct FUIVFXInitData;
@@ -14,7 +14,7 @@ class UUIVFXParticleManagerWidget;
  * 
  */
 UCLASS()
-class MLLIKE_API UMLlikeHUD : public UUserWidget
+class MLLIKE_API UMLlikeHUD : public UCommonActivatableWidget
 {
 	GENERATED_BODY()
 	

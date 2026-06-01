@@ -8,6 +8,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
 #include "EnemyDefinitionDataAsset.h"
+#include "EnemySpawningSubsystem.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayEffectTypes.h"
@@ -16,7 +17,6 @@
 #include "MLlikeGameplayTags.h"
 #include "TimerManager.h"
 #include "TwinStickCharacter.h"
-#include "TwinStickGameMode.h"
 #include "TwinStickNPCDestruction.h"
 #include "TwinStickPickup.h"
 
@@ -73,12 +73,6 @@ void ATwinStickNPC::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// increment the NPC counter so we can cap spawning if necessary
-	if (ATwinStickGameMode* GM = Cast<ATwinStickGameMode>(GetWorld()->GetAuthGameMode()))
-	{
-		GM->IncreaseNPCs();
-	}
-
 	if (IsValid(m_ASC))
 	{
 		m_ASC->InitAbilityActorInfo(this, this);
@@ -132,10 +126,9 @@ void ATwinStickNPC::EndPlay(EEndPlayReason::Type EndPlayReason)
 
 void ATwinStickNPC::Destroyed()
 {
-	// decrease the NPC counter so we can cap spawning if necessary
-	if (ATwinStickGameMode* GM = Cast<ATwinStickGameMode>(GetWorld()->GetAuthGameMode()))
+	if (UEnemySpawningSubsystem* const EnemySpawningSubsystem = GetWorld()->GetSubsystem<UEnemySpawningSubsystem>(); IsValid(EnemySpawningSubsystem))
 	{
-		GM->DecreaseNPCs();
+		EnemySpawningSubsystem->EnemyDestroyed();
 	}
 
 	Super::Destroyed();

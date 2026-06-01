@@ -6,6 +6,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "UISubsystem.generated.h"
 
+class UChoiceScreenWidget;
 class UUIRootWidget;
 
 /**
@@ -18,6 +19,8 @@ class MLLIKE_API UUISubsystem : public UGameInstanceSubsystem
 	
 public:
 	void InitializeUI(TSubclassOf<UUIRootWidget> WidgetClass);
+
+	UChoiceScreenWidget* ShowPerkSelectionScreen();
 
 private:
 	TObjectPtr<UUIRootWidget> UIWidget;

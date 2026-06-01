@@ -6,6 +6,7 @@
 #include "CommonActivatableWidget.h"
 #include "UIRootWidget.generated.h"
 
+class UChoiceScreenWidget;
 class UCommonActivatableWidgetStack;
 
 /**
@@ -19,13 +20,18 @@ class MLLIKE_API UUIRootWidget : public UCommonActivatableWidget
 public:
 	void ShowHUD();
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UCommonActivatableWidget> HUDWidgetClass;
+	UChoiceScreenWidget* ShowPerkSelectionScreen();
 
+protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UCommonActivatableWidgetStack> GameStack;
 
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UCommonActivatableWidgetStack> ModalStack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UCommonActivatableWidget> HUDWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UChoiceScreenWidget> PerkSelectionScreenClass;
 };

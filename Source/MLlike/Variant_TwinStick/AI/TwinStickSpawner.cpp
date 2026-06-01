@@ -6,14 +6,10 @@
 #include "AssetRegistry/AssetData.h"
 #include "EnemyDefinitionDataAsset.h"
 #include "Engine/World.h"
-#include "TimerManager.h"
 #include "NavigationSystem.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "Kismet/GameplayStatics.h"
 #include "TwinStickNPC.h"
-#include "TwinStickGameMode.h"
-
-static TAutoConsoleVariable<bool> CVarEnableEnemySpawn(TEXT("ml.EnableEnemySpawn"), true, TEXT(""));
 
 ATwinStickSpawner::ATwinStickSpawner()
 {
@@ -39,40 +35,6 @@ void ATwinStickSpawner::BeginPlay()
 		UE_LOG(LogTemp, Log, TEXT("Could not find recast navmesh"));
 
 	}
-
-	// set up the spawn timer
-	GetWorld()->GetTimerManager().SetTimer(SpawnGroupTimer, this, &ATwinStickSpawner::SpawnNPCGroup, SpawnGroupDelay, true);
-
-	// spawn the first group of NPCs
-	SpawnNPCGroup();
-}
-
-void ATwinStickSpawner::EndPlay(EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-
-	// clear the spawn timers
-	GetWorld()->GetTimerManager().ClearTimer(SpawnGroupTimer);
-	GetWorld()->GetTimerManager().ClearTimer(SpawnNPCTimer);
-}
-
-void ATwinStickSpawner::SpawnNPCGroup()
-{
-	// doing this here instead of when the timer is set means we don't need to restart the game to enable the command
-	if (CVarEnableEnemySpawn.GetValueOnGameThread())
-	{
-		// reset the group spawn counter
-		SpawnCount = 0;
-
-		// check if we're still under the max NPC cap
-		if (ATwinStickGameMode* GM = Cast<ATwinStickGameMode>(GetWorld()->GetAuthGameMode()))
-		{
-			if (GM->CanSpawnNPCs())
-			{
-				SpawnNPC();
-			}
-		}
-	}
 }
 
 void ATwinStickSpawner::SpawnNPC()
@@ -80,32 +42,27 @@ void ATwinStickSpawner::SpawnNPC()
 	FTransform SpawnTransform;
 
 	// find a random point around the spawner
-	FVector SpawnLoc;
-	if (UNavigationSystemV1::K2_GetRandomReachablePointInRadius(GetWorld(), GetActorLocation(), SpawnLoc, SpawnRadius, NavData))
+	FVector CurrentActorLocation = GetActorLocation();
+	FVector RandomSpawnLocation = CurrentActorLocation;
+	while (RandomSpawnLocation == CurrentActorLocation)
 	{
-		SpawnTransform.SetLocation(SpawnLoc);
+		UNavigationSystemV1::K2_GetRandomReachablePointInRadius(GetWorld(), GetActorLocation(), RandomSpawnLocation, SpawnRadius, NavData);
+	}
 
-		ATwinStickNPC* NPC = GetWorld()->SpawnActorDeferred<ATwinStickNPC>(NPCClass, SpawnTransform);
-		if (IsValid(NPC))
+	SpawnTransform.SetLocation(RandomSpawnLocation);
+
+	ATwinStickNPC* NPC = GetWorld()->SpawnActorDeferred<ATwinStickNPC>(NPCClass, SpawnTransform);
+	if (IsValid(NPC))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("spawning enemy"));
+
+		if (EnemyDefinitions.Num() > 0)
 		{
-			if (EnemyDefinitions.Num() > 0)
-			{
-				const int32 Index = FMath::RandRange(0, FMath::Clamp(EnemyDefinitions.Num() - 1, 0, EnemyDefinitions.Num() - 1));
-				NPC->SetEnemyDefinitionDataAsset(EnemyDefinitions[Index].LoadSynchronous());
-			}
-			NPC->FinishSpawning(NPC->GetTransform());
+			const int32 Index = FMath::RandRange(0, FMath::Clamp(EnemyDefinitions.Num() - 1, 0, EnemyDefinitions.Num() - 1));
+			NPC->SetEnemyDefinitionDataAsset(EnemyDefinitions[Index].LoadSynchronous());
 		}
+		NPC->FinishSpawning(NPC->GetTransform());
 	}
-
-	// increase the spawn counter
-	++SpawnCount;
-
-	// do we still have enemies left to spawn?
-	if (SpawnCount < SpawnGroupSize)
-	{
-		GetWorld()->GetTimerManager().SetTimer(SpawnNPCTimer, this, &ATwinStickSpawner::SpawnNPC, FMath::RandRange(MinSpawnDelay, MaxSpawnDelay), false);
-	}
-
 }
 
 void ATwinStickSpawner::InitializeEnemyDefinitions()

@@ -3,32 +3,47 @@
 
 #include "RunDirectorSubsystem.h"
 
-#include "TwinStickGameMode.h"
+#include "Engine/World.h"
+#include "ChoiceScreenWidget.h"
 #include "MLlikeLogCategories.h"
-
-void URunDirectorSubsystem::RegisterGameMode(ATwinStickGameMode* const GameMode)
-{
-	if (!IsValid(GameMode))
-	{
-		UE_LOG(LogMLlikeGeneral, Warning, TEXT("%s - GameMode is not valid - won't be able to be informed when the wave is cleared which will affect perk screen / spawning new waves"), TEXT(__FUNCSIG__));
-		return;
-	}
-
-	OnWaveClearedHandle = GameMode->OnWaveCleared.AddUObject(this, &URunDirectorSubsystem::HandleWaveCleared);
-}
+#include "UISubsystem.h"
+#include "EnemySpawningSubsystem.h"
 
 void URunDirectorSubsystem::HandleWaveCleared()
 {
-	OnSpawnNextWave.ExecuteIfBound();
+	if (UUISubsystem* const UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>(); IsValid(UISubsystem))
+	{
+		if (UChoiceScreenWidget* ChoiceScreen = UISubsystem->ShowPerkSelectionScreen(); IsValid(ChoiceScreen))
+		{
+			ChoiceScreen->OnChoiceMade.BindLambda([this]() { OnSpawnNextWave.ExecuteIfBound(); });
+		}
+	}
 }
 
-void URunDirectorSubsystem::UnregisterGameMode(ATwinStickGameMode* const GameMode)
+
+void URunDirectorSubsystem::RegisterEnemySpawningSubsystem(UEnemySpawningSubsystem* const EnemySpawningSubsystem)
 {
-	if (!IsValid(GameMode))
+	if (!IsValid(EnemySpawningSubsystem))
 	{
-		UE_LOG(LogMLlikeGeneral, Warning, TEXT("%s - GameMode is not valid - won't be able to unregister any events that were previously registered"), TEXT(__FUNCSIG__));
+		UE_LOG(LogMLlikeGeneral, Warning, TEXT("%s - EnemySpawningSubsystem is not valid - won't be able to be informed when the wave is cleared which will affect perk screen / spawning new waves"), TEXT(__FUNCSIG__));
 		return;
 	}
 
-	GameMode->OnWaveCleared.Remove(OnWaveClearedHandle);
+	OnWaveClearedHandle = EnemySpawningSubsystem->OnWaveCleared.AddUObject(this, &URunDirectorSubsystem::HandleWaveCleared);
+
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this]() {OnSpawnNextWave.ExecuteIfBound(); });
+	
+}
+
+void URunDirectorSubsystem::UnregisterEnemySpawningSubsystem(UWorld* World, bool bSessionEnded, bool bCleanupResources)
+{
+	if (UEnemySpawningSubsystem* const EnemySpawningSubsystem = GetWorld()->GetSubsystem<UEnemySpawningSubsystem>(); IsValid(EnemySpawningSubsystem))
+	{
+		EnemySpawningSubsystem->OnWaveCleared.Remove(OnWaveClearedHandle);
+	}
+	else
+	{
+		UE_LOG(LogMLlikeGeneral, Warning, TEXT("%s - EnemySpawningSubsystem is not valid - won't be able to unregister any events that were previously registered"), TEXT(__FUNCSIG__));
+		return;
+	}
 }

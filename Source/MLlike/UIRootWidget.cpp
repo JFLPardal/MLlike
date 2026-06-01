@@ -3,9 +3,15 @@
 
 #include "UIRootWidget.h"
 
+#include "ChoiceScreenWidget.h"
 #include "Widgets/CommonActivatableWidgetContainer.h"
 
 void UUIRootWidget::ShowHUD()
 {
 	GameStack->AddWidget<UCommonActivatableWidget>(HUDWidgetClass);
+}
+
+UChoiceScreenWidget* UUIRootWidget::ShowPerkSelectionScreen()
+{
+	return ModalStack->AddWidget<UChoiceScreenWidget>(PerkSelectionScreenClass);
 }

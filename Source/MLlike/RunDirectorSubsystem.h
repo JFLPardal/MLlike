@@ -8,7 +8,8 @@
 
 DECLARE_DELEGATE(FOnSpawnNextWave);
 
-class ATwinStickGameMode;
+class UEnemySpawningSubsystem;
+class UWorld;
 
 /**
  * 
@@ -19,8 +20,9 @@ class MLLIKE_API URunDirectorSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-	void RegisterGameMode(ATwinStickGameMode* const GameMode);
-	void UnregisterGameMode(ATwinStickGameMode* const GameMode);
+	void RegisterEnemySpawningSubsystem(UEnemySpawningSubsystem* const EnemySpawningSubsystem);
+	// needed? unused right now
+	void UnregisterEnemySpawningSubsystem(UWorld* World, bool bSessionEnded, bool bCleanupResources);
 
 	FOnSpawnNextWave OnSpawnNextWave;
 

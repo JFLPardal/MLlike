@@ -14,7 +14,6 @@
 ATwinStickSpawner::ATwinStickSpawner()
 {
  	PrimaryActorTick.bCanEverTick = true;
-	
 }
 
 void ATwinStickSpawner::BeginPlay()
@@ -42,7 +41,7 @@ void ATwinStickSpawner::SpawnNPC()
 	FTransform SpawnTransform;
 
 	// find a random point around the spawner
-	FVector CurrentActorLocation = GetActorLocation();
+	FVector CurrentActorLocation = GetActorLocation() + FVector(0.0f, 0.0f, SpawnRadius);
 	FVector RandomSpawnLocation = CurrentActorLocation;
 	while (RandomSpawnLocation == CurrentActorLocation)
 	{
@@ -54,8 +53,6 @@ void ATwinStickSpawner::SpawnNPC()
 	ATwinStickNPC* NPC = GetWorld()->SpawnActorDeferred<ATwinStickNPC>(NPCClass, SpawnTransform);
 	if (IsValid(NPC))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("spawning enemy"));
-
 		if (EnemyDefinitions.Num() > 0)
 		{
 			const int32 Index = FMath::RandRange(0, FMath::Clamp(EnemyDefinitions.Num() - 1, 0, EnemyDefinitions.Num() - 1));

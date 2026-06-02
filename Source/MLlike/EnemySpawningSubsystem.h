@@ -20,10 +20,14 @@ class MLLIKE_API UEnemySpawningSubsystem : public UWorldSubsystem
 		
 public:
 	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
-
+	
 	void EnemyDestroyed();
 
 	FOnWaveCleared OnWaveCleared;
+
+#if !UE_BUILD_SHIPPING
+	void DebugClearWave();
+#endif
 
 protected:
 	// needed to make sure this subsystem is not initialized during editor creation, when RunDirectorSubsystem might not be available
@@ -32,7 +36,9 @@ protected:
 private:
 	void HandleOnSpawnNextWave();
 
-	int32 NumActiveEnemies = 0;
-	int32 NumMaxActiveEnemies = 3;
-	TArray<ATwinStickSpawner*> Spawners;
+private:
+	int32 NumRemaningEnemiesInWave = 0;
+	int32 NumMaxEnemiesPerWave = 3;
+	TArray<ATwinStickSpawner*> AllSpawners;
+	TArray<ATwinStickSpawner*> UnusedSpawners;
 };

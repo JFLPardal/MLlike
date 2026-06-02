@@ -27,7 +27,7 @@ protected:
 
 	/** Radius around the spawner where it can spawn NPCs */
 	UPROPERTY(EditAnywhere, Category="NPC Spawner", meta = (ClampMin = 0, ClampMax = 1000, Units = "cm"))
-	float SpawnRadius = 600.0f;
+	float SpawnRadius = 100.0f;
 
 	/** Pointer to the recast nav mesh actor, used to provide NPC spawn locations */
 	TObjectPtr<ARecastNavMesh> NavData;

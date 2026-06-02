@@ -86,6 +86,10 @@ public:
 
 	void SetEnemyDefinitionDataAsset(UEnemyDefinitionDataAsset* const DataAsset);
 
+#if !UE_BUILD_SHIPPING
+	void DebugKill();
+#endif
+
 protected:
 
 	/** Gameplay Initialization */

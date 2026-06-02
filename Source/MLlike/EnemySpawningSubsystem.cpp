@@ -3,12 +3,32 @@
 
 #include "EnemySpawningSubsystem.h"
 
+#include "Algo/RandomShuffle.h"
 #include "EngineUtils.h"
+#include "MLlikeLogCategories.h"
 #include "RunDirectorSubsystem.h"
 #include "TwinStickSpawner.h"
 
 static TAutoConsoleVariable<bool> CVarEnableEnemySpawn(TEXT("ml.EnableEnemySpawn"), true, TEXT(""));
 static TAutoConsoleVariable<int32> CVarMaxNumEnemiesToSpawnPerWave(TEXT("ml.MaxNumEnemiesToSpawnPerWave"), 0, TEXT("if <= 0, native value will be used"));
+
+static FAutoConsoleCommandWithWorld ClearWaveCommand(
+	TEXT("ML.ClearWave"),
+	TEXT(""),
+	FConsoleCommandWithWorldDelegate::CreateStatic(
+	[](UWorld* World)
+	{
+		if (!World)
+		{
+			return;
+		}
+
+		if (UEnemySpawningSubsystem* const EnemySpawningSubsystem = World->GetSubsystem< UEnemySpawningSubsystem>(); IsValid(EnemySpawningSubsystem))
+		{
+			EnemySpawningSubsystem->DebugClearWave();
+		}
+	})
+);
 
 void UEnemySpawningSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
@@ -16,8 +36,12 @@ void UEnemySpawningSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 
 	for (TActorIterator<ATwinStickSpawner> SpawnerIt(GetWorld()); SpawnerIt; ++SpawnerIt)
 	{
-		Spawners.Add(*SpawnerIt);
+		AllSpawners.Add(*SpawnerIt);
 	}
+
+	UnusedSpawners.Reserve(AllSpawners.Num());
+	UnusedSpawners = AllSpawners;
+	Algo::RandomShuffle(UnusedSpawners);
 
 	if (URunDirectorSubsystem* RunDirectorSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<URunDirectorSubsystem>(); IsValid(RunDirectorSubsystem))
 	{
@@ -29,12 +53,16 @@ void UEnemySpawningSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 
 void UEnemySpawningSubsystem::EnemyDestroyed()
 {
-	NumActiveEnemies = FMath::Max(0, --NumActiveEnemies);
-	UE_LOG(LogTemp, Warning, TEXT("enemy destroyed. %d/%d remaining"), NumActiveEnemies, NumMaxActiveEnemies);
+	NumRemaningEnemiesInWave = FMath::Max(0, --NumRemaningEnemiesInWave);
+	UE_LOG(LogMLlikeGeneral, Warning, TEXT("enemy destroyed. %d/%d remaining"), NumRemaningEnemiesInWave, NumMaxEnemiesPerWave);
 
-	if (NumActiveEnemies == 0)
+	if (NumRemaningEnemiesInWave == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("broadcasting OnWaveCleared"));
+		UE_LOG(LogMLlikeGeneral, Warning, TEXT("broadcasting OnWaveCleared"));
+
+		UnusedSpawners = AllSpawners;
+		Algo::RandomShuffle(UnusedSpawners);
+
 		OnWaveCleared.Broadcast();
 	}
 }
@@ -46,14 +74,29 @@ bool UEnemySpawningSubsystem::DoesSupportWorldType(const EWorldType::Type WorldT
 
 void UEnemySpawningSubsystem::HandleOnSpawnNextWave()
 {
-	if (CVarEnableEnemySpawn.GetValueOnGameThread() && Spawners.Num() > 0)
+	const int32 NumSpawners = AllSpawners.Num();
+	if (CVarEnableEnemySpawn.GetValueOnGameThread() && NumSpawners > 0)
 	{
-		NumMaxActiveEnemies = CVarMaxNumEnemiesToSpawnPerWave.GetValueOnGameThread() > 0 ? CVarMaxNumEnemiesToSpawnPerWave.GetValueOnGameThread() : NumMaxActiveEnemies;
+		NumMaxEnemiesPerWave = CVarMaxNumEnemiesToSpawnPerWave.GetValueOnGameThread() > 0 ? CVarMaxNumEnemiesToSpawnPerWave.GetValueOnGameThread() : NumMaxEnemiesPerWave;
 
-		for (NumActiveEnemies = 0; NumActiveEnemies < NumMaxActiveEnemies; ++NumActiveEnemies)
+		if (NumMaxEnemiesPerWave > NumSpawners)
 		{
-			const int32 Index = FMath::RandRange(0, FMath::Clamp(Spawners.Num() - 1, 0, Spawners.Num() - 1));
-			Spawners[Index]->SpawnNPC();
+			UE_LOG(LogMLlikeGeneral, Error, TEXT("Not enough ATwinStickSpawner in the level [%d] to spawn [%d] Enemies. Only [%d] enemies will be spawned"), NumSpawners, NumMaxEnemiesPerWave, NumSpawners);
+		}
+
+		for (NumRemaningEnemiesInWave = 0; NumRemaningEnemiesInWave < NumMaxEnemiesPerWave && UnusedSpawners.Num() > 0; ++NumRemaningEnemiesInWave)
+		{
+			UnusedSpawners.Pop(EAllowShrinking::No)->SpawnNPC();
 		}
 	}
 }
+
+#if !UE_BUILD_SHIPPING
+void UEnemySpawningSubsystem::DebugClearWave()
+{
+	for (TActorIterator<ATwinStickNPC> EnemyIt(GetWorld()); EnemyIt; ++EnemyIt)
+	{
+		EnemyIt->DebugKill();
+	}
+}
+#endif

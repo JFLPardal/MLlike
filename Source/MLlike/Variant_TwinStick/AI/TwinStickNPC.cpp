@@ -69,6 +69,13 @@ void ATwinStickNPC::SetEnemyDefinitionDataAsset(UEnemyDefinitionDataAsset* const
 	m_DefinitionAsset = DataAsset;
 }
 
+#if !UE_BUILD_SHIPPING
+void ATwinStickNPC::DebugKill()
+{
+	Killed();
+}
+#endif
+
 void ATwinStickNPC::BeginPlay()
 {
 	Super::BeginPlay();

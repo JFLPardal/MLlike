@@ -8,6 +8,8 @@
 
 DECLARE_DELEGATE(FOnChoiceMade)
 
+class UCommonButtonBase;
+
 /**
  * 
  */
@@ -23,14 +25,9 @@ protected:
 	virtual void NativeOnActivated() override;
 	virtual void NativeOnDeactivated() override;
 
-	//TODO delete after confirmation button is added
-	UPROPERTY(EditAnywhere)
-	float AutoCloseTimerDuration = 1.0f;
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	TObjectPtr<UCommonButtonBase> m_ConfirmButton = nullptr;
 
 private:
-	//TODO delete after confirmation button is added
-	void AutoClose();
-
-	//TODO delete after confirmation button is added
-	FTimerHandle AutoCloseHandle;
+	void HandleOnConfirmButtonClicked();
 };

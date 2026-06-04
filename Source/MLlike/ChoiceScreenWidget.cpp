@@ -3,11 +3,13 @@
 
 #include "ChoiceScreenWidget.h"
 
+#include "CommonButtonBase.h"
+
 void UChoiceScreenWidget::NativeOnActivated()
 {
 	Super::NativeOnActivated();
 
-	GetWorld()->GetTimerManager().SetTimer(AutoCloseHandle, this, &UChoiceScreenWidget::AutoClose, AutoCloseTimerDuration);
+	m_ConfirmButton->OnClicked().AddUObject(this, &UChoiceScreenWidget::HandleOnConfirmButtonClicked);
 }
 
 void UChoiceScreenWidget::NativeOnDeactivated()
@@ -15,10 +17,9 @@ void UChoiceScreenWidget::NativeOnDeactivated()
 	Super::NativeOnDeactivated();
 	
 	OnChoiceMade.Unbind();
-	GetWorld()->GetTimerManager().ClearTimer(AutoCloseHandle);
 }
 
-void UChoiceScreenWidget::AutoClose()
+void UChoiceScreenWidget::HandleOnConfirmButtonClicked()
 {
 	OnChoiceMade.ExecuteIfBound();
 

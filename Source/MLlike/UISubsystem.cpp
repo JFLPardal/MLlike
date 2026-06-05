@@ -21,11 +21,11 @@ void UUISubsystem::InitializeUI(TSubclassOf<UUIRootWidget> WidgetClass)
 	}
 }
 
-UChoiceScreenWidget* UUISubsystem::ShowPerkSelectionScreen()
+UChoiceScreenWidget* UUISubsystem::ShowChoiceSelectionScreen(const FChoiceScreenWidgetConfig& Config)
 {
 	if (IsValid(UIWidget))
 	{
-		return UIWidget->ShowPerkSelectionScreen();
+		return UIWidget->ShowChoiceSelectionScreen(Config);
 	}
 
 	return nullptr;

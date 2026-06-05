@@ -3,23 +3,79 @@
 
 #include "RunDirectorSubsystem.h"
 
+#include "Algo/RandomShuffle.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "Engine/World.h"
+#include "ChoiceOptionConfig.h"
+#include "ChoiceScreenConfig.h"
 #include "ChoiceScreenWidget.h"
 #include "MLlikeLogCategories.h"
 #include "UISubsystem.h"
 #include "EnemySpawningSubsystem.h"
 
+void URunDirectorSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+	Super::Initialize(Collection);
+
+	FindPerkSelectionScreenConfig();
+}
+
+void URunDirectorSubsystem::FindPerkSelectionScreenConfig()
+{
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+	TArray<FAssetData> PerkSelectionScreenOptionsAssets;
+	//TODO how to make sure we only get perk selection screen config?
+	AssetRegistryModule.Get().GetAssetsByClass(UChoiceScreenConfig::StaticClass()->GetClassPathName(), PerkSelectionScreenOptionsAssets);
+	for (const FAssetData& PerkSelectionScreenOptionAsset : PerkSelectionScreenOptionsAssets)
+	{
+		PerkSelectionScreenConfig.Add(TSoftObjectPtr<UChoiceScreenConfig>(PerkSelectionScreenOptionAsset.GetSoftObjectPath()));
+	}
+
+	if (PerkSelectionScreenConfig.IsEmpty())
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - No perks option configs found - PerkSelectionScreen will not be shown.\nDo we have any assets inheriting from UChoiceOptionConfig?"), TEXT(__FUNCSIG__));
+	}
+	else if (PerkSelectionScreenConfig.Num() > 1)
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Found more than 1 possible config for perk selection screen"), TEXT(__FUNCSIG__));
+	}
+}
+
 void URunDirectorSubsystem::HandleWaveCleared()
 {
-	if (UUISubsystem* const UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>(); IsValid(UISubsystem))
+	if (UUISubsystem* const UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>(); IsValid(UISubsystem) && !PerkSelectionScreenConfig.IsEmpty())
 	{
-		if (UChoiceScreenWidget* ChoiceScreen = UISubsystem->ShowPerkSelectionScreen(); IsValid(ChoiceScreen))
+		if (UnchosenPerks.IsEmpty())
+		{
+			if (!bInitializedUnchosenPerks && PerkSelectionScreenConfig[0].LoadSynchronous())
+			{
+				UnchosenPerks = PerkSelectionScreenConfig[0]->AvailableChoices;
+				bInitializedUnchosenPerks = true;
+			}
+			else
+			{
+				OnSpawnNextWave.ExecuteIfBound();
+				return;
+			}
+		}
+
+		TArray<const UChoiceOptionConfig* const> ChoicesToShow;
+		const int32 NumChoicesToShow = FMath::Min(3, UnchosenPerks.Num());
+		Algo::RandomShuffle(UnchosenPerks);
+		for (int i = 0; i < NumChoicesToShow; ++i)
+		{
+			ChoicesToShow.Add(UnchosenPerks[i]);
+		}
+
+		FChoiceScreenWidgetConfig PerkScreenWidgetConfig(ChoicesToShow, PerkSelectionScreenConfig[0]->ChoiceEntryWidgetClass);
+
+		if (UChoiceScreenWidget* ChoiceScreen = UISubsystem->ShowChoiceSelectionScreen(PerkScreenWidgetConfig); IsValid(ChoiceScreen))
 		{
 			ChoiceScreen->OnChoiceMade.BindLambda([this]() { OnSpawnNextWave.ExecuteIfBound(); });
 		}
 	}
 }
-
 
 void URunDirectorSubsystem::RegisterEnemySpawningSubsystem(UEnemySpawningSubsystem* const EnemySpawningSubsystem)
 {

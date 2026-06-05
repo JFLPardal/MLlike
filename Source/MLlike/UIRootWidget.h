@@ -6,6 +6,7 @@
 #include "CommonActivatableWidget.h"
 #include "UIRootWidget.generated.h"
 
+struct FChoiceScreenWidgetConfig;
 class UChoiceScreenWidget;
 class UCommonActivatableWidgetStack;
 
@@ -20,7 +21,7 @@ class MLLIKE_API UUIRootWidget : public UCommonActivatableWidget
 public:
 	void ShowHUD();
 
-	UChoiceScreenWidget* ShowPerkSelectionScreen();
+	UChoiceScreenWidget* ShowChoiceSelectionScreen(const FChoiceScreenWidgetConfig& Config);
 
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))

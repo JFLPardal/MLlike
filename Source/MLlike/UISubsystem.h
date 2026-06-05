@@ -6,6 +6,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "UISubsystem.generated.h"
 
+struct FChoiceScreenWidgetConfig;
 class UChoiceScreenWidget;
 class UUIRootWidget;
 
@@ -20,7 +21,7 @@ class MLLIKE_API UUISubsystem : public UGameInstanceSubsystem
 public:
 	void InitializeUI(TSubclassOf<UUIRootWidget> WidgetClass);
 
-	UChoiceScreenWidget* ShowPerkSelectionScreen();
+	UChoiceScreenWidget* ShowChoiceSelectionScreen(const FChoiceScreenWidgetConfig& Config);
 
 private:
 	TObjectPtr<UUIRootWidget> UIWidget;

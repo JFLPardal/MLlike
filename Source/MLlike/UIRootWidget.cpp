@@ -11,7 +11,10 @@ void UUIRootWidget::ShowHUD()
 	GameStack->AddWidget<UCommonActivatableWidget>(HUDWidgetClass);
 }
 
-UChoiceScreenWidget* UUIRootWidget::ShowPerkSelectionScreen()
+UChoiceScreenWidget* UUIRootWidget::ShowChoiceSelectionScreen(const FChoiceScreenWidgetConfig& Config)
 {
-	return ModalStack->AddWidget<UChoiceScreenWidget>(PerkSelectionScreenClass);
+	UChoiceScreenWidget* const ChoiceScreenWidget = ModalStack->AddWidget<UChoiceScreenWidget>(PerkSelectionScreenClass);
+	ChoiceScreenWidget->InitializeWithConfig(Config);
+	
+	return ChoiceScreenWidget;
 }

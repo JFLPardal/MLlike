@@ -8,6 +8,7 @@
 
 DECLARE_DELEGATE(FOnSpawnNextWave);
 
+class UChoiceScreenConfig;
 class UEnemySpawningSubsystem;
 class UWorld;
 
@@ -20,6 +21,8 @@ class MLLIKE_API URunDirectorSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
 	void RegisterEnemySpawningSubsystem(UEnemySpawningSubsystem* const EnemySpawningSubsystem);
 	// needed? unused right now
 	void UnregisterEnemySpawningSubsystem(UWorld* World, bool bSessionEnded, bool bCleanupResources);
@@ -29,5 +32,12 @@ public:
 private:
 	void HandleWaveCleared();
 
+	void FindPerkSelectionScreenConfig();
+
+private:
 	FDelegateHandle OnWaveClearedHandle;
+
+	TArray<TSoftObjectPtr<UChoiceScreenConfig>> PerkSelectionScreenConfig;
+	TArray<TObjectPtr<UChoiceOptionConfig>> UnchosenPerks;
+	bool bInitializedUnchosenPerks = false;
 };

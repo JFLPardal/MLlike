@@ -23,7 +23,7 @@ static FAutoConsoleCommandWithWorld ClearWaveCommand(
 			return;
 		}
 
-		if (UEnemySpawningSubsystem* const EnemySpawningSubsystem = World->GetSubsystem< UEnemySpawningSubsystem>(); IsValid(EnemySpawningSubsystem))
+		if (UEnemySpawningSubsystem* const EnemySpawningSubsystem = World->GetSubsystem<UEnemySpawningSubsystem>(); IsValid(EnemySpawningSubsystem))
 		{
 			EnemySpawningSubsystem->DebugClearWave();
 		}

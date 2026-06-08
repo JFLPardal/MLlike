@@ -6,6 +6,21 @@
 #include "ChoiceEntryWidget.h"
 #include "CommonButtonBase.h"
 
+void UChoiceScreenWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
+	if (IsDesignTime())
+	{
+		if (IsValid(DesignerTestingConfig.ChoiceEntryWidgetClass) && !DesignerTestingConfig.ChoicesToShow.IsEmpty())
+		{
+			Cleanup();
+			InitializeWithConfig(DesignerTestingConfig);
+			bChoicesInitialized = false;
+		}
+	}
+}
+
 void UChoiceScreenWidget::NativeOnActivated()
 {
 	Super::NativeOnActivated();
@@ -23,12 +38,16 @@ void UChoiceScreenWidget::InitializeWithConfig(const FChoiceScreenWidgetConfig& 
 		return;
 	}
 
-	for (UChoiceOptionConfig const* const ChoieOptionConfig : Config.ChoicesToShow)
+	for (UChoiceOptionConfig const* const ChoiceOptionConfig : Config.ChoicesToShow)
 	{
-		UChoiceEntryWidget* const ChoiceEntryWidget = CreateWidget<UChoiceEntryWidget>(this, Config.ChoiceEntryWidgetClass);
-		ChoiceEntryWidget->InitializeWithConfig(ChoieOptionConfig);
+		if (IsValid(ChoiceOptionConfig))
+		{
+			UChoiceEntryWidget* const ChoiceEntryWidget = CreateWidget<UChoiceEntryWidget>(this, Config.ChoiceEntryWidgetClass);
+			ChoiceEntryWidget->SetPadding(PaddingForEntries);
+			ChoiceEntryWidget->InitializeWithConfig(ChoiceOptionConfig);
 
-		m_ChoicesList->AddChild(ChoiceEntryWidget);
+			m_ChoicesList->AddChild(ChoiceEntryWidget);
+		}
 	}
 
 	bChoicesInitialized = true;

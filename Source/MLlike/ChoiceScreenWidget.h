@@ -13,7 +13,7 @@ class UChoiceOptionConfig;
 class UCommonButtonBase;
 class UPanelWidget;
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FChoiceScreenWidgetConfig
 {
 	GENERATED_BODY()
@@ -21,11 +21,11 @@ struct FChoiceScreenWidgetConfig
 	FChoiceScreenWidgetConfig();
 	FChoiceScreenWidgetConfig(TArray<const UChoiceOptionConfig* const>& InChoicesToShow, TSubclassOf<UChoiceEntryWidget> InChoiceEntryWidgetClass);
 
-	UPROPERTY()
-	TArray<const UChoiceOptionConfig* const> ChoicesToShow;
-
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<UChoiceEntryWidget> ChoiceEntryWidgetClass;
+
+	UPROPERTY(EditAnywhere)
+	TArray<const UChoiceOptionConfig* const> ChoicesToShow;
 };
 
 /**
@@ -37,6 +37,8 @@ class MLLIKE_API UChoiceScreenWidget : public UCommonActivatableWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativePreConstruct() override;
+
 	FOnChoiceMade OnChoiceMade;
 
 	void InitializeWithConfig(const FChoiceScreenWidgetConfig& Config);
@@ -52,7 +54,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UPanelWidget> m_ChoicesList = nullptr;
 
+	UPROPERTY(EditAnywhere, Category="DesignerViewTesting")
+	FMargin PaddingForEntries { 0, 5 };
+
 	bool bChoicesInitialized = false;
+
+	UPROPERTY(EditAnywhere, Category="DesignerViewTesting")
+	FChoiceScreenWidgetConfig DesignerTestingConfig;
 
 private:
 	void HandleOnConfirmButtonClicked();

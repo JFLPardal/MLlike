@@ -6,12 +6,12 @@
 #include "CommonActivatableWidget.h"
 #include "ChoiceScreenWidget.generated.h"
 
-DECLARE_DELEGATE(FOnChoiceMade)
-
 class UChoiceEntryWidget;
 class UChoiceOptionConfig;
 class UCommonButtonBase;
 class UPanelWidget;
+
+DECLARE_DELEGATE_OneParam(FOnChoiceMade, const UChoiceOptionConfig* const)
 
 USTRUCT(BlueprintType)
 struct FChoiceScreenWidgetConfig
@@ -19,7 +19,7 @@ struct FChoiceScreenWidgetConfig
 	GENERATED_BODY()
 
 	FChoiceScreenWidgetConfig();
-	FChoiceScreenWidgetConfig(TArray<const UChoiceOptionConfig* const>& InChoicesToShow, TSubclassOf<UChoiceEntryWidget> InChoiceEntryWidgetClass);
+	FChoiceScreenWidgetConfig(TSubclassOf<UChoiceEntryWidget> InChoiceEntryWidgetClass, TArray<const UChoiceOptionConfig* const>& InChoicesToShow);
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UChoiceEntryWidget> ChoiceEntryWidgetClass;
@@ -44,13 +44,9 @@ public:
 	void InitializeWithConfig(const FChoiceScreenWidgetConfig& Config);
 
 protected:
-	virtual void NativeOnActivated() override;
 	virtual void NativeOnDeactivated() override;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
-	TObjectPtr<UCommonButtonBase> m_ConfirmButton = nullptr;
-
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UPanelWidget> m_ChoicesList = nullptr;
 
@@ -63,7 +59,7 @@ protected:
 	FChoiceScreenWidgetConfig DesignerTestingConfig;
 
 private:
-	void HandleOnConfirmButtonClicked();
+	void HandleOnChoiceChosen(const UChoiceOptionConfig* const ChosenConfig);
 
 	void Cleanup();
 };

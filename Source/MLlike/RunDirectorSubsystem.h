@@ -8,6 +8,7 @@
 
 DECLARE_DELEGATE(FOnSpawnNextWave);
 
+class UChoiceOptionConfig;
 class UChoiceScreenConfig;
 class UEnemySpawningSubsystem;
 class UWorld;

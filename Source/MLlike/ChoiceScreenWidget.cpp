@@ -21,13 +21,6 @@ void UChoiceScreenWidget::NativePreConstruct()
 	}
 }
 
-void UChoiceScreenWidget::NativeOnActivated()
-{
-	Super::NativeOnActivated();
-
-	m_ConfirmButton->OnClicked().AddUObject(this, &UChoiceScreenWidget::HandleOnConfirmButtonClicked);
-}
-
 void UChoiceScreenWidget::InitializeWithConfig(const FChoiceScreenWidgetConfig& Config)
 {
 	ensureMsgf(!bChoicesInitialized, TEXT("%s - Trying to Initialize a ChoiceScreenWidget that is already Initialized"), TEXT(__FUNCSIG__));
@@ -45,6 +38,7 @@ void UChoiceScreenWidget::InitializeWithConfig(const FChoiceScreenWidgetConfig& 
 			UChoiceEntryWidget* const ChoiceEntryWidget = CreateWidget<UChoiceEntryWidget>(this, Config.ChoiceEntryWidgetClass);
 			ChoiceEntryWidget->SetPadding(PaddingForEntries);
 			ChoiceEntryWidget->InitializeWithConfig(ChoiceOptionConfig);
+			ChoiceEntryWidget->OnChosen.BindUObject(this, &UChoiceScreenWidget::HandleOnChoiceChosen);
 
 			m_ChoicesList->AddChild(ChoiceEntryWidget);
 		}
@@ -53,9 +47,9 @@ void UChoiceScreenWidget::InitializeWithConfig(const FChoiceScreenWidgetConfig& 
 	bChoicesInitialized = true;
 }
 
-void UChoiceScreenWidget::HandleOnConfirmButtonClicked()
+void UChoiceScreenWidget::HandleOnChoiceChosen(const UChoiceOptionConfig* const ChosenConfig)
 {
-	OnChoiceMade.ExecuteIfBound();
+	OnChoiceMade.ExecuteIfBound(ChosenConfig);
 
 	DeactivateWidget();
 }
@@ -74,9 +68,9 @@ void UChoiceScreenWidget::NativeOnDeactivated()
 	Cleanup();
 }
 
-FChoiceScreenWidgetConfig::FChoiceScreenWidgetConfig(TArray<const UChoiceOptionConfig* const>& InChoicesToShow, TSubclassOf<UChoiceEntryWidget> InChoiceEntryWidgetClass)
-	: ChoicesToShow(InChoicesToShow)
-	, ChoiceEntryWidgetClass(InChoiceEntryWidgetClass)
+FChoiceScreenWidgetConfig::FChoiceScreenWidgetConfig(TSubclassOf<UChoiceEntryWidget> InChoiceEntryWidgetClass, TArray<const UChoiceOptionConfig* const>& InChoicesToShow)
+	: ChoiceEntryWidgetClass(InChoiceEntryWidgetClass)
+	, ChoicesToShow(InChoicesToShow)
 {
 }
 

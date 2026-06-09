@@ -12,4 +12,13 @@ void UChoiceEntryWidget::InitializeWithConfig(const UChoiceOptionConfig* const C
 	Icon->SetBrushFromTexture(ChoiceConfig->Icon);
 	Name->SetText(ChoiceConfig->Name);
 	Description->SetText(ChoiceConfig->Description);
+
+	Config = ChoiceConfig;
+}
+
+void UChoiceEntryWidget::HandleButtonClicked()
+{
+	Super::HandleButtonClicked();
+
+	OnChosen.ExecuteIfBound(Config);
 }

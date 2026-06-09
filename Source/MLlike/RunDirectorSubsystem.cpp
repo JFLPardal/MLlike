@@ -6,10 +6,10 @@
 #include "Algo/RandomShuffle.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Engine/World.h"
-#include "ChoiceOptionConfig.h"
 #include "ChoiceScreenConfig.h"
 #include "ChoiceScreenWidget.h"
 #include "MLlikeLogCategories.h"
+#include "PerkChoiceOptionConfig.h"
 #include "UISubsystem.h"
 #include "EnemySpawningSubsystem.h"
 
@@ -68,11 +68,29 @@ void URunDirectorSubsystem::HandleWaveCleared()
 			ChoicesToShow.Add(UnchosenPerks[i]);
 		}
 
-		FChoiceScreenWidgetConfig PerkScreenWidgetConfig(ChoicesToShow, PerkSelectionScreenConfig[0]->ChoiceEntryWidgetClass);
+		FChoiceScreenWidgetConfig PerkScreenWidgetConfig(PerkSelectionScreenConfig[0]->ChoiceEntryWidgetClass, ChoicesToShow);
 
 		if (UChoiceScreenWidget* ChoiceScreen = UISubsystem->ShowChoiceSelectionScreen(PerkScreenWidgetConfig); IsValid(ChoiceScreen))
 		{
-			ChoiceScreen->OnChoiceMade.BindLambda([this]() { OnSpawnNextWave.ExecuteIfBound(); });
+			ChoiceScreen->OnChoiceMade.BindLambda([this](const UChoiceOptionConfig* const ChosenConfig) 
+				{
+					if (IsValid(ChosenConfig))
+					{
+						UE_LOG(LogMLlikeGeneral, Warning, TEXT("Option Chosen - %s"), *ChosenConfig->GetName());
+						if (const UPerkChoiceOptionConfig* const PerkConfig = Cast<UPerkChoiceOptionConfig>(ChosenConfig); IsValid(PerkConfig))
+						{
+							UE_LOG(LogMLlikeGeneral, Warning, TEXT("TagToGrant - %s"), *PerkConfig->TagToGrant.ToString());
+							UE_LOG(LogMLlikeGeneral, Warning, TEXT("gameplayeffect name - %s"), *PerkConfig->GameplayEffectToGrant->GetName());
+							
+						}
+						else
+						{
+							UE_LOG(LogMLlikeGeneral, Warning, TEXT("Chosen perk is not of type UPerkChoiceOptionConfig - %s"), *ChosenConfig->GetName());
+						}
+					}
+
+					OnSpawnNextWave.ExecuteIfBound(); 
+				});
 		}
 	}
 }

@@ -3,12 +3,15 @@
 
 #include "RunDirectorSubsystem.h"
 
+#include "AbilitySystemComponent.h"
 #include "Algo/RandomShuffle.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Engine/World.h"
 #include "ChoiceScreenConfig.h"
 #include "ChoiceScreenWidget.h"
+#include "MLlikeGameplayTags.h"
 #include "MLlikeLogCategories.h"
+#include "MLlikeUtils.h"
 #include "PerkChoiceOptionConfig.h"
 #include "UISubsystem.h"
 #include "EnemySpawningSubsystem.h"
@@ -72,27 +75,47 @@ void URunDirectorSubsystem::HandleWaveCleared()
 
 		if (UChoiceScreenWidget* ChoiceScreen = UISubsystem->ShowChoiceSelectionScreen(PerkScreenWidgetConfig); IsValid(ChoiceScreen))
 		{
-			ChoiceScreen->OnChoiceMade.BindLambda([this](const UChoiceOptionConfig* const ChosenConfig) 
-				{
-					if (IsValid(ChosenConfig))
-					{
-						UE_LOG(LogMLlikeGeneral, Warning, TEXT("Option Chosen - %s"), *ChosenConfig->GetName());
-						if (const UPerkChoiceOptionConfig* const PerkConfig = Cast<UPerkChoiceOptionConfig>(ChosenConfig); IsValid(PerkConfig))
-						{
-							UE_LOG(LogMLlikeGeneral, Warning, TEXT("TagToGrant - %s"), *PerkConfig->TagToGrant.ToString());
-							UE_LOG(LogMLlikeGeneral, Warning, TEXT("gameplayeffect name - %s"), *PerkConfig->GameplayEffectToGrant->GetName());
-							
-						}
-						else
-						{
-							UE_LOG(LogMLlikeGeneral, Warning, TEXT("Chosen perk is not of type UPerkChoiceOptionConfig - %s"), *ChosenConfig->GetName());
-						}
-					}
-
-					OnSpawnNextWave.ExecuteIfBound(); 
-				});
+			ChoiceScreen->OnChoiceMade.BindUObject(this, &URunDirectorSubsystem::HandleChoiceMade); 
 		}
 	}
+}
+
+void URunDirectorSubsystem::HandleChoiceMade(const UChoiceOptionConfig* const ChosenConfig)
+{
+	if (!IsValid(ChosenConfig))
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Trying to grant an invalid Perk - Perk won't be granted"), TEXT(__FUNCSIG__));
+		return;
+
+	}
+	
+	const UPerkChoiceOptionConfig* const PerkConfig = Cast<UPerkChoiceOptionConfig>(ChosenConfig);
+	if (!IsValid(PerkConfig))
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Trying to grant an invalid Perk - choice option config selected [%s] must inherit from UPerkChoiceOptionConfig, it's currently inheriting from [%s]. Perk won't be granted"), 
+			TEXT(__FUNCSIG__),
+			*ChosenConfig->GetName(),
+			*ChosenConfig->GetClass()->GetName());
+		return;
+	}
+
+
+	if (UAbilitySystemComponent* const PlayerAbilitySystemComponent = MLlikeUtils::GetPlayerAbilitySystemComponent(GetGameInstance()->GetWorld()); IsValid(PlayerAbilitySystemComponent))
+	{
+		FGameplayEffectSpecHandle SpecHandle = PlayerAbilitySystemComponent->MakeOutgoingSpec(PerkConfig->GameplayEffectToGrant, /*Level*/ 1, PlayerAbilitySystemComponent->MakeEffectContext());
+		SpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Effects_AddMaxAmmo, 3);
+		// if we want to change the values applied, either use the level or something similar to this
+		//SpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_BaseHealth_MaxHealth, (IsValid(m_DefinitionAsset)) ? m_DefinitionAsset->GetMaxInitialHealth() : 1);
+		PlayerAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+	}
+
+	// TODO delete when effects are being properly applied
+	UE_LOG(LogMLlikeGeneral, Warning, TEXT("Option Chosen - %s / TagToGrant - %s / gameplayeffect name - %s"), 
+		*PerkConfig->GetName(), 
+		*PerkConfig->TagToGrant.ToString(),
+		*PerkConfig->GameplayEffectToGrant->GetName());
+
+	OnSpawnNextWave.ExecuteIfBound();
 }
 
 void URunDirectorSubsystem::RegisterEnemySpawningSubsystem(UEnemySpawningSubsystem* const EnemySpawningSubsystem)

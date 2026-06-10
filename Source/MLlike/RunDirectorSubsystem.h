@@ -32,6 +32,7 @@ public:
 
 private:
 	void HandleWaveCleared();
+	void HandleChoiceMade(const UChoiceOptionConfig* const ChosenConfig);
 
 	void FindPerkSelectionScreenConfig();
 

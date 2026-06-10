@@ -59,7 +59,7 @@ protected:
 	FChoiceScreenWidgetConfig DesignerTestingConfig;
 
 private:
-	void HandleOnChoiceChosen(const UChoiceOptionConfig* const ChosenConfig);
+	void HandleOnChoiceMade(const UChoiceOptionConfig* const ChosenConfig);
 
 	void Cleanup();
 };

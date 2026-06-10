@@ -38,7 +38,7 @@ void UChoiceScreenWidget::InitializeWithConfig(const FChoiceScreenWidgetConfig& 
 			UChoiceEntryWidget* const ChoiceEntryWidget = CreateWidget<UChoiceEntryWidget>(this, Config.ChoiceEntryWidgetClass);
 			ChoiceEntryWidget->SetPadding(PaddingForEntries);
 			ChoiceEntryWidget->InitializeWithConfig(ChoiceOptionConfig);
-			ChoiceEntryWidget->OnChosen.BindUObject(this, &UChoiceScreenWidget::HandleOnChoiceChosen);
+			ChoiceEntryWidget->OnChosen.BindUObject(this, &UChoiceScreenWidget::HandleOnChoiceMade);
 
 			m_ChoicesList->AddChild(ChoiceEntryWidget);
 		}
@@ -47,7 +47,7 @@ void UChoiceScreenWidget::InitializeWithConfig(const FChoiceScreenWidgetConfig& 
 	bChoicesInitialized = true;
 }
 
-void UChoiceScreenWidget::HandleOnChoiceChosen(const UChoiceOptionConfig* const ChosenConfig)
+void UChoiceScreenWidget::HandleOnChoiceMade(const UChoiceOptionConfig* const ChosenConfig)
 {
 	OnChoiceMade.ExecuteIfBound(ChosenConfig);
 

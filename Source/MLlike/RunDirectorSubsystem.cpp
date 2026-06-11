@@ -102,10 +102,12 @@ void URunDirectorSubsystem::HandleChoiceMade(const UChoiceOptionConfig* const Ch
 
 	if (UAbilitySystemComponent* const PlayerAbilitySystemComponent = MLlikeUtils::GetPlayerAbilitySystemComponent(GetGameInstance()->GetWorld()); IsValid(PlayerAbilitySystemComponent))
 	{
-		FGameplayEffectSpecHandle SpecHandle = PlayerAbilitySystemComponent->MakeOutgoingSpec(PerkConfig->GameplayEffectToGrant, /*Level*/ 1, PlayerAbilitySystemComponent->MakeEffectContext());
-		SpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Effects_AddMaxAmmo, 3);
-		// if we want to change the values applied, either use the level or something similar to this
-		//SpecHandle.Data->SetSetByCallerMagnitude(MLlikeGameplayTags::TAG_MLlike_Attribute_BaseHealth_MaxHealth, (IsValid(m_DefinitionAsset)) ? m_DefinitionAsset->GetMaxInitialHealth() : 1);
+		const int32 Level = 1;
+		FGameplayEffectSpecHandle SpecHandle = PlayerAbilitySystemComponent->MakeOutgoingSpec(PerkConfig->GameplayEffectToGrant, Level, PlayerAbilitySystemComponent->MakeEffectContext());
+		for (const FMLlikeGameplayEffectMagnitude& GEMagnitude : PerkConfig->GameplayEffectMagnitudes)
+		{
+			SpecHandle.Data->SetSetByCallerMagnitude(GEMagnitude.DataTag, GEMagnitude.Magnitude.GetValueAtLevel(Level));
+		}
 		PlayerAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 	}
 

@@ -9,8 +9,26 @@
 
 class UGameplayEffect;
 
+
+USTRUCT(BlueprintType)
+struct FMLlikeGameplayEffectMagnitude
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FGameplayTag DataTag;
+
+	UPROPERTY(EditAnywhere)
+	FScalableFloat Magnitude; 
+};
+
 /**
- * 
+ * includes validation for 
+ * (1) GameplayEffectToGrant specified
+ * (2) duplicated tags in GameplayEffectMagnitudes
+ * (3) all necessary 'SetByCaller' tags are specified in GameplayEffectMagnitudes
+ * (4) GameplayEffectMagnitudes only has the tags used in GameplayEffectToGrant ( no extra tags )
+ * (5) ensure entries in GameplayEffectMagnitudes have a valid tag
  */
 UCLASS()
 class MLLIKE_API UPerkChoiceOptionConfig : public UChoiceOptionConfig
@@ -23,4 +41,12 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> GameplayEffectToGrant;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FMLlikeGameplayEffectMagnitude> GameplayEffectMagnitudes;
+
+public:
+#if WITH_EDITOR
+	virtual EDataValidationResult IsDataValid(class FDataValidationContext& Context) const override;
+#endif
 };

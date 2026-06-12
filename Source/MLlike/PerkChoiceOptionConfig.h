@@ -11,7 +11,7 @@ class UGameplayEffect;
 
 
 USTRUCT(BlueprintType)
-struct FMLlikeGameplayEffectMagnitude
+struct FPerkParameter
 {
 	GENERATED_BODY()
 
@@ -19,7 +19,10 @@ struct FMLlikeGameplayEffectMagnitude
 	FGameplayTag DataTag;
 
 	UPROPERTY(EditAnywhere)
-	FScalableFloat Magnitude; 
+	FScalableFloat Magnitude;
+
+	UPROPERTY(EditAnywhere)
+	FName DescriptionArgumentName;
 };
 
 /**
@@ -43,9 +46,11 @@ public:
 	TSubclassOf<UGameplayEffect> GameplayEffectToGrant;
 
 	UPROPERTY(EditAnywhere)
-	TArray<FMLlikeGameplayEffectMagnitude> GameplayEffectMagnitudes;
+	TArray<FPerkParameter> PerkParameters;
 
 public:
+	virtual FText GetDescription() const override;
+
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(class FDataValidationContext& Context) const override;
 #endif

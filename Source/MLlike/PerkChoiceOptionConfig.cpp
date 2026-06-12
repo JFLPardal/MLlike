@@ -6,6 +6,19 @@
 #include "GameplayEffect.h"
 #include "Misc/DataValidation.h"
 
+
+FText UPerkChoiceOptionConfig::GetDescription() const
+{
+	FFormatNamedArguments Args;
+	for (const FPerkParameter& PerkParameter : PerkParameters)
+	{
+		// TODO get level here as last arg
+		Args.Add(PerkParameter.DescriptionArgumentName.ToString(), PerkParameter.Magnitude.GetValueAtLevel(1));
+	}
+
+	return FText::Format(Description, Args);
+}
+
 EDataValidationResult UPerkChoiceOptionConfig::IsDataValid(class FDataValidationContext& Context) const
 {
 	EDataValidationResult Result = Super::IsDataValid(Context);
@@ -17,7 +30,7 @@ EDataValidationResult UPerkChoiceOptionConfig::IsDataValid(class FDataValidation
 
 	// check for dup tags in GameplayEffectMagnitudes
 	TSet<FGameplayTag> GameplayEffectMagnitudesTags;
-	for (const FMLlikeGameplayEffectMagnitude& GEMagnitude : GameplayEffectMagnitudes)
+	for (const FPerkParameter& GEMagnitude : PerkParameters)
 	{
 		if (!GEMagnitude.DataTag.IsValid())
 		{

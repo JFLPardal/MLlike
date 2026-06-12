@@ -26,4 +26,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FText Description;
+
+public:
+	virtual FText GetDescription() const { return Description; }
 };

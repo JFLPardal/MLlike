@@ -104,7 +104,7 @@ void URunDirectorSubsystem::HandleChoiceMade(const UChoiceOptionConfig* const Ch
 	{
 		const int32 Level = 1;
 		FGameplayEffectSpecHandle SpecHandle = PlayerAbilitySystemComponent->MakeOutgoingSpec(PerkConfig->GameplayEffectToGrant, Level, PlayerAbilitySystemComponent->MakeEffectContext());
-		for (const FMLlikeGameplayEffectMagnitude& GEMagnitude : PerkConfig->GameplayEffectMagnitudes)
+		for (const FPerkParameter& GEMagnitude : PerkConfig->PerkParameters)
 		{
 			SpecHandle.Data->SetSetByCallerMagnitude(GEMagnitude.DataTag, GEMagnitude.Magnitude.GetValueAtLevel(Level));
 		}

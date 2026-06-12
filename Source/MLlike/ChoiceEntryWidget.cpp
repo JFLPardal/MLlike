@@ -11,7 +11,7 @@ void UChoiceEntryWidget::InitializeWithConfig(const UChoiceOptionConfig* const C
 {
 	Icon->SetBrushFromTexture(ChoiceConfig->Icon);
 	Name->SetText(ChoiceConfig->Name);
-	Description->SetText(ChoiceConfig->Description);
+	Description->SetText(ChoiceConfig->GetDescription());
 
 	Config = ChoiceConfig;
 }

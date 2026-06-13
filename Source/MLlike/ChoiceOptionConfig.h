@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "RarityEnum.h"
 #include "ChoiceOptionConfig.generated.h"
 
 class UTexture2D;
@@ -29,4 +30,12 @@ public:
 
 public:
 	virtual FText GetDescription() const { return Description; }
+
+	ERarity GetRarity() const;
+
+	//Rarity defines how strong the effect to apply will be. Common is the weakest, Legendary the strongest ( not enforced in DataValidation ).
+	void SetRarity(ERarity InRarity);
+
+private:
+	ERarity Rarity{ ERarity::Common };
 };

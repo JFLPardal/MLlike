@@ -5,6 +5,7 @@
 
 #include "GameplayEffect.h"
 #include "Misc/DataValidation.h"
+#include "MLlikeLogCategories.h"
 
 
 FText UPerkChoiceOptionConfig::GetDescription() const
@@ -12,8 +13,7 @@ FText UPerkChoiceOptionConfig::GetDescription() const
 	FFormatNamedArguments Args;
 	for (const FPerkParameter& PerkParameter : PerkParameters)
 	{
-		// TODO get level here as last arg
-		Args.Add(PerkParameter.DescriptionArgumentName.ToString(), PerkParameter.Magnitude.GetValueAtLevel(1));
+		Args.Add(PerkParameter.DescriptionArgumentName.ToString(), PerkParameter.GetMagnitudeForRarity(GetRarity()));
 	}
 
 	return FText::Format(Description, Args);
@@ -93,4 +93,19 @@ EDataValidationResult UPerkChoiceOptionConfig::IsDataValid(class FDataValidation
 	}
 	
 	return Result;
+}
+
+int32 FPerkParameter::GetMagnitudeForRarity(ERarity Rarity) const
+{
+	for (const FRarityToValue& RarityToValueEntry : MagnitudePerRarity)
+	{
+		if (RarityToValueEntry.Rarity == Rarity)
+		{
+			return RarityToValueEntry.Value;
+		}
+	}
+
+	UE_LOG(LogMLlikeGeneral, Error, TEXT("Requesting Magnitude for an unspecified Rarity for PerkParameter with Description Text [%s]. Common rarity will be used"), *DescriptionArgumentName.ToString());
+
+	return 1;
 }

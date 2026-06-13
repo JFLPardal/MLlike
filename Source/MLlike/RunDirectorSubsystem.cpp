@@ -6,27 +6,51 @@
 #include "AbilitySystemComponent.h"
 #include "Algo/RandomShuffle.h"
 #include "AssetRegistry/AssetRegistryModule.h"
-#include "Engine/World.h"
 #include "ChoiceScreenConfig.h"
 #include "ChoiceScreenWidget.h"
+#include "EnemySpawningSubsystem.h"
+#include "Engine/World.h"
 #include "MLlikeGameplayTags.h"
 #include "MLlikeLogCategories.h"
 #include "MLlikeUtils.h"
 #include "PerkChoiceOptionConfig.h"
+#include "RarityWeightConfig.h"
 #include "UISubsystem.h"
-#include "EnemySpawningSubsystem.h"
 
 void URunDirectorSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-
-	FindPerkSelectionScreenConfig();
-}
-
-void URunDirectorSubsystem::FindPerkSelectionScreenConfig()
-{
+	
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 
+	// TODO better solution for this, maybe specify in project settings
+	FindPerkRarityWeightConfig(AssetRegistryModule);
+
+	// TODO better solution for this, maybe specify in project settings
+	FindPerkSelectionScreenConfig(AssetRegistryModule);
+}
+
+void URunDirectorSubsystem::FindPerkRarityWeightConfig(const FAssetRegistryModule& AssetRegistryModule)
+{
+	TArray<FAssetData> RarityWeightConfigAssets;
+	//TODO how to make sure we only get perk rarity?
+	AssetRegistryModule.Get().GetAssetsByClass(URarityWeightConfig::StaticClass()->GetClassPathName(), RarityWeightConfigAssets);
+
+	if (RarityWeightConfigAssets.IsEmpty())
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - No RarityWeightConfig found - all presented perks will use the same rarity.\nDo we have any assets inheriting from URarityWeightConfig?"), TEXT(__FUNCSIG__));
+		return; 
+	}
+	else if (RarityWeightConfigAssets.Num() > 1)
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Found more than 1 possible config for perk selection screen, will use [%s]"), TEXT(__FUNCSIG__), *RarityWeightConfigAssets[0].GetFullName());
+	}
+
+	PerkRarityWeights = TSoftObjectPtr<URarityWeightConfig>(RarityWeightConfigAssets[0].GetSoftObjectPath());
+}
+
+void URunDirectorSubsystem::FindPerkSelectionScreenConfig(const FAssetRegistryModule& AssetRegistryModule)
+{
 	TArray<FAssetData> PerkSelectionScreenOptionsAssets;
 	//TODO how to make sure we only get perk selection screen config?
 	AssetRegistryModule.Get().GetAssetsByClass(UChoiceScreenConfig::StaticClass()->GetClassPathName(), PerkSelectionScreenOptionsAssets);
@@ -68,6 +92,8 @@ void URunDirectorSubsystem::HandleWaveCleared()
 		Algo::RandomShuffle(UnchosenPerks);
 		for (int i = 0; i < NumChoicesToShow; ++i)
 		{
+			//TODO move this to Choice OptionConfig
+			UnchosenPerks[i]->SetRarity(IsValid(PerkRarityWeights.LoadSynchronous()) ? PerkRarityWeights->GetRandomRarity() : ERarity::Default);
 			ChoicesToShow.Add(UnchosenPerks[i]);
 		}
 
@@ -102,11 +128,10 @@ void URunDirectorSubsystem::HandleChoiceMade(const UChoiceOptionConfig* const Ch
 
 	if (UAbilitySystemComponent* const PlayerAbilitySystemComponent = MLlikeUtils::GetPlayerAbilitySystemComponent(GetGameInstance()->GetWorld()); IsValid(PlayerAbilitySystemComponent))
 	{
-		const int32 Level = 1;
-		FGameplayEffectSpecHandle SpecHandle = PlayerAbilitySystemComponent->MakeOutgoingSpec(PerkConfig->GameplayEffectToGrant, Level, PlayerAbilitySystemComponent->MakeEffectContext());
+		FGameplayEffectSpecHandle SpecHandle = PlayerAbilitySystemComponent->MakeOutgoingSpec(PerkConfig->GameplayEffectToGrant, /*Level*/ 1, PlayerAbilitySystemComponent->MakeEffectContext());
 		for (const FPerkParameter& GEMagnitude : PerkConfig->PerkParameters)
 		{
-			SpecHandle.Data->SetSetByCallerMagnitude(GEMagnitude.DataTag, GEMagnitude.Magnitude.GetValueAtLevel(Level));
+			SpecHandle.Data->SetSetByCallerMagnitude(GEMagnitude.DataTag, GEMagnitude.GetMagnitudeForRarity(PerkConfig->GetRarity()));
 		}
 		PlayerAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 	}

@@ -8,10 +8,12 @@
 
 DECLARE_DELEGATE(FOnSpawnNextWave);
 
+class FAssetRegistryModule;
 class UChoiceOptionConfig;
 class UChoiceScreenConfig;
 class UEnemySpawningSubsystem;
 class UWorld;
+class URarityWeightConfig;
 
 /**
  * 
@@ -34,12 +36,20 @@ private:
 	void HandleWaveCleared();
 	void HandleChoiceMade(const UChoiceOptionConfig* const ChosenConfig);
 
-	void FindPerkSelectionScreenConfig();
+	void FindPerkSelectionScreenConfig(const FAssetRegistryModule& AssetRegistryModule);
+	void FindPerkRarityWeightConfig(const FAssetRegistryModule& AssetRegistryModule);
 
 private:
 	FDelegateHandle OnWaveClearedHandle;
 
+	UPROPERTY()
 	TArray<TSoftObjectPtr<UChoiceScreenConfig>> PerkSelectionScreenConfig;
+
+	UPROPERTY()
 	TArray<TObjectPtr<UChoiceOptionConfig>> UnchosenPerks;
+
 	bool bInitializedUnchosenPerks = false;
+	
+	UPROPERTY()
+	TSoftObjectPtr<URarityWeightConfig> PerkRarityWeights;
 };

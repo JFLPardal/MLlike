@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "ChoiceOptionConfig.h"
+#include "RarityEnum.h"
 #include "GameplayTagContainer.h"
 #include "PerkChoiceOptionConfig.generated.h"
 
 class UGameplayEffect;
-
 
 USTRUCT(BlueprintType)
 struct FPerkParameter
@@ -18,11 +18,13 @@ struct FPerkParameter
 	UPROPERTY(EditAnywhere)
 	FGameplayTag DataTag;
 
-	UPROPERTY(EditAnywhere)
-	FScalableFloat Magnitude;
+	UPROPERTY(EditAnywhere, meta = (TitleProperty = "Rarity"))
+	TArray<FRarityToValue> MagnitudePerRarity{ {ERarity::Common, 1}, {ERarity::Rare, 1}, {ERarity::Epic, 1}, {ERarity::Legendary, 1} };
 
 	UPROPERTY(EditAnywhere)
 	FName DescriptionArgumentName;
+
+	int32 GetMagnitudeForRarity(ERarity Rarity) const;
 };
 
 /**

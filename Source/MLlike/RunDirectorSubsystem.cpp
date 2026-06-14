@@ -93,7 +93,7 @@ void URunDirectorSubsystem::HandleWaveCleared()
 		for (int i = 0; i < NumChoicesToShow; ++i)
 		{
 			//TODO move this to Choice OptionConfig
-			UnchosenPerks[i]->SetRarity(IsValid(PerkRarityWeights.LoadSynchronous()) ? PerkRarityWeights->GetRandomRarity() : ERarity::Default);
+			UnchosenPerks[i]->SetRarity(IsValid(PerkRarityWeights.LoadSynchronous()) ? PerkRarityWeights->GetRandomRarity() : ERarity::Common);
 			ChoicesToShow.Add(UnchosenPerks[i]);
 		}
 

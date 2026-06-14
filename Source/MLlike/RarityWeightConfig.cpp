@@ -26,5 +26,5 @@ ERarity URarityWeightConfig::GetRandomRarity() const
 		AccumulatedWeight += RarityWeight.Value;
 	}
 
-	return ERarity::Default;
+	return ERarity::Common;
 }

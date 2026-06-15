@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CommonButtonBase.h"
+#include "RarityEnum.h"
 #include "ChoiceEntryWidget.generated.h"
 
 
@@ -29,6 +30,9 @@ public:
 protected:
 	virtual void HandleButtonClicked() override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_Initialize();
+
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UImage> Icon;
@@ -38,6 +42,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UCommonTextBlock> Description;
+
+	UPROPERTY(BlueprintReadOnly)
+	ERarity Rarity;
 
 	TObjectPtr<const UChoiceOptionConfig> Config;
 };

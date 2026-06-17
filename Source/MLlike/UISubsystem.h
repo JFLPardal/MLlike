@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "UISubsystem.generated.h"
 
+class UDamageTypeConfig;
 struct FChoiceScreenWidgetConfig;
 class UChoiceScreenWidget;
+class UGameplayEffect;
 class UUIRootWidget;
 class URarityToColorConfig;
 enum class ERarity : uint8;
@@ -30,11 +33,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FColor GetColorForRarity(ERarity Rarity) const;
 
+	// TODO move
+	UFUNCTION(BlueprintCallable)
+	TSubclassOf<UGameplayEffect> GetGameplayEffectToApplyForDamageType(FGameplayTag DamageTypeTag);
+
 private:
 	void FindRarityToColorConfig();
+
+//TODO MOVE
+	void FindDamageTypeConfigs();
 
 private:
 	TObjectPtr<UUIRootWidget> UIWidget;
 
 	TObjectPtr<URarityToColorConfig> RarityToColorConfig;
+
+//TODO MOVE
+	TMap<FGameplayTag, const UDamageTypeConfig* const> DamageTypeTagToGameplayEffectToApply;
 };

@@ -134,6 +134,7 @@ void URunDirectorSubsystem::HandleChoiceMade(const UChoiceOptionConfig* const Ch
 			SpecHandle.Data->SetSetByCallerMagnitude(GEMagnitude.DataTag, GEMagnitude.GetMagnitudeForRarity(PerkConfig->GetRarity()));
 		}
 		PlayerAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+		PlayerAbilitySystemComponent->AddLooseGameplayTag(PerkConfig->TagToGrant);
 	}
 
 	// TODO delete when effects are being properly applied

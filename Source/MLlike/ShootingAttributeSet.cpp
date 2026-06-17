@@ -13,6 +13,13 @@
 
 static TAutoConsoleVariable<bool> CVarInfiniteAmmo(TEXT("ML.InfiniteAmmo"), false, TEXT("UI widget will not be updated while this is turned on"));
 
+UShootingAttributeSet::UShootingAttributeSet()
+{
+	InitShootingFireDamage(0.0f);
+	InitShootingFireDuration(0.0f);
+	InitShootingFirePeriod(0.0f);
+}
+
 void UShootingAttributeSet::InitDependentAttributes()
 {
 	SetEnergy(GetMaxEnergy());

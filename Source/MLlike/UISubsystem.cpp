@@ -4,6 +4,7 @@
 #include "UISubsystem.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "DamageTypeConfig.h"
 #include "Kismet/GameplayStatics.h"
 #include "MLlikeLogCategories.h"
 #include "RarityEnum.h"
@@ -15,6 +16,8 @@ void UUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 
 	FindRarityToColorConfig();
+
+	FindDamageTypeConfigs();
 }
 
 void UUISubsystem::InitializeUI(TSubclassOf<UUIRootWidget> WidgetClass)
@@ -46,6 +49,16 @@ FColor UUISubsystem::GetColorForRarity(ERarity Rarity) const
 	return RarityToColorConfig->GetColorForRarity(Rarity);
 }
 
+TSubclassOf<UGameplayEffect> UUISubsystem::GetGameplayEffectToApplyForDamageType(FGameplayTag DamageTypeTag)
+{
+	if (const UDamageTypeConfig* const DamageTypeConfig = *DamageTypeTagToGameplayEffectToApply.Find(DamageTypeTag); IsValid(DamageTypeConfig))
+	{
+		return DamageTypeConfig->EffectToApply;
+	}
+
+	return nullptr;
+}
+
 void UUISubsystem::FindRarityToColorConfig()
 {
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
@@ -65,4 +78,27 @@ void UUISubsystem::FindRarityToColorConfig()
 
 	TSoftObjectPtr<URarityToColorConfig> RarityToColorConfigSoftPtr = TSoftObjectPtr<URarityToColorConfig>(RarityToColorConfigAssets[0].GetSoftObjectPath());
 	RarityToColorConfig = RarityToColorConfigSoftPtr.LoadSynchronous();
+}
+
+void UUISubsystem::FindDamageTypeConfigs()
+{
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+	TArray<FAssetData> DamageTypeConfigAssets;
+	AssetRegistryModule.Get().GetAssetsByClass(UDamageTypeConfig::StaticClass()->GetClassPathName(), DamageTypeConfigAssets);
+
+	if (DamageTypeConfigAssets.IsEmpty())
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - No DamageTypeConfig found - DamageType effects won't apply any damage.\nDo we have any assets inheriting from UDamageTypeConfig?"), TEXT(__FUNCSIG__));
+		return;
+	}
+
+	for (const FAssetData& DamageTypeConfigAsset : DamageTypeConfigAssets)
+	{
+		TSoftObjectPtr<UDamageTypeConfig> DamageTypeConfigSoftPtr = TSoftObjectPtr<UDamageTypeConfig>(DamageTypeConfigAsset.GetSoftObjectPath());
+		if (UDamageTypeConfig* DamageTypeConfig = DamageTypeConfigSoftPtr.LoadSynchronous(); IsValid(DamageTypeConfig))
+		{
+			DamageTypeTagToGameplayEffectToApply.Add({ DamageTypeConfig->DamageTypeTag, DamageTypeConfig });
+		}
+	}
 }

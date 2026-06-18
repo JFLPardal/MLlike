@@ -9,6 +9,26 @@
 
 class UGameplayEffect;
 
+UENUM()
+enum class EGameplayEffectParameterType
+{
+	SetByCaller,
+	Period,
+	Duration
+};
+
+USTRUCT(BlueprintType)
+struct FGameplayEffectParameterType
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FGameplayTag Tag;
+
+	UPROPERTY(EditAnywhere)
+	EGameplayEffectParameterType ParameterType;
+};
+
 UCLASS()
 class MLLIKE_API UDamageTypeConfig : public UPrimaryDataAsset
 {
@@ -16,8 +36,16 @@ class MLLIKE_API UDamageTypeConfig : public UPrimaryDataAsset
 
 public:
 	UPROPERTY(EditAnywhere)
-	FGameplayTag DamageTypeTag;
+	FGameplayTag Tag;
 		
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> EffectToApply;
+
+	UPROPERTY(EditAnywhere, meta = (TitleProperty = "Tag"))
+	TArray<FGameplayEffectParameterType> RelevantAttributesForGameplayEffect;
+
+public:
+#if WITH_EDITOR
+	virtual EDataValidationResult IsDataValid(class FDataValidationContext& Context) const override;
+#endif
 };

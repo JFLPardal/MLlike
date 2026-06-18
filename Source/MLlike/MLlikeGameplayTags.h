@@ -11,6 +11,9 @@ namespace MLlikeGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_Shooting_MaxAmmo);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_Shooting_MaxEnergy);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_Shooting_FireDamage);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_Shooting_FireDuration);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_Shooting_FirePeriod);
+
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_BaseHealth_MaxHealth);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Effects_AddMaxAmmo);

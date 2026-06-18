@@ -7,10 +7,12 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "UISubsystem.generated.h"
 
+class UAbilitySystemComponent;
 class UDamageTypeConfig;
 struct FChoiceScreenWidgetConfig;
 class UChoiceScreenWidget;
 class UGameplayEffect;
+class UGameplayTagToAttributeConverter;
 class UUIRootWidget;
 class URarityToColorConfig;
 enum class ERarity : uint8;
@@ -35,7 +37,7 @@ public:
 
 	// TODO move
 	UFUNCTION(BlueprintCallable)
-	TSubclassOf<UGameplayEffect> GetGameplayEffectToApplyForDamageType(FGameplayTag DamageTypeTag);
+	void ApplyGameplayEffectForDamageType(FGameplayTag DamageTypeTag, UAbilitySystemComponent* const Source, UAbilitySystemComponent* const Target);
 
 private:
 	void FindRarityToColorConfig();
@@ -43,10 +45,14 @@ private:
 //TODO MOVE
 	void FindDamageTypeConfigs();
 
+//TODO move
+	void FindGameplayTagsToGameplayAttributesConfig();
+
 private:
 	TObjectPtr<UUIRootWidget> UIWidget;
 
 	TObjectPtr<URarityToColorConfig> RarityToColorConfig;
+	TObjectPtr<UGameplayTagToAttributeConverter> GameplayTagsToGameplayAttributesConverter;
 
 //TODO MOVE
 	TMap<FGameplayTag, const UDamageTypeConfig* const> DamageTypeTagToGameplayEffectToApply;

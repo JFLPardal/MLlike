@@ -3,8 +3,10 @@
 
 #include "UISubsystem.h"
 
+#include "AbilitySystemComponent.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "DamageTypeConfig.h"
+#include "GameplayTagToAttributeConfig.h"
 #include "Kismet/GameplayStatics.h"
 #include "MLlikeLogCategories.h"
 #include "RarityEnum.h"
@@ -18,6 +20,8 @@ void UUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	FindRarityToColorConfig();
 
 	FindDamageTypeConfigs();
+
+	FindGameplayTagsToGameplayAttributesConfig();
 }
 
 void UUISubsystem::InitializeUI(TSubclassOf<UUIRootWidget> WidgetClass)
@@ -49,14 +53,68 @@ FColor UUISubsystem::GetColorForRarity(ERarity Rarity) const
 	return RarityToColorConfig->GetColorForRarity(Rarity);
 }
 
-TSubclassOf<UGameplayEffect> UUISubsystem::GetGameplayEffectToApplyForDamageType(FGameplayTag DamageTypeTag)
+void UUISubsystem::ApplyGameplayEffectForDamageType(FGameplayTag DamageTypeTag, UAbilitySystemComponent* const Source, UAbilitySystemComponent* const Target)
 {
-	if (const UDamageTypeConfig* const DamageTypeConfig = *DamageTypeTagToGameplayEffectToApply.Find(DamageTypeTag); IsValid(DamageTypeConfig))
+	if (!IsValid(Source))
 	{
-		return DamageTypeConfig->EffectToApply;
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Invalid Source AbilitySystemComponent was given with DamageTypeTag [%s]. No GameplayEffect will be applied"), 
+											TEXT(__FUNCSIG__),
+											*DamageTypeTag.ToString());
+		return;
 	}
 
-	return nullptr;
+	if (!IsValid(Target))
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Invalid Target AbilitySystemComponent was given with DamageTypeTag [%s]. No GameplayEffect will be applied"),
+											TEXT(__FUNCSIG__),
+											*DamageTypeTag.ToString());
+		return;
+	}
+
+	const UDamageTypeConfig* const DamageTypeConfig = *DamageTypeTagToGameplayEffectToApply.Find(DamageTypeTag);
+	if (!IsValid(DamageTypeConfig))
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Can't find UDamageTypeConfig for damage type tag [%s]. No GameplayEffect will be applied"),
+											TEXT(__FUNCSIG__),
+											*DamageTypeTag.ToString());
+		return;
+	}
+	
+	TSubclassOf<UGameplayEffect> GESubclassToApply = DamageTypeConfig->EffectToApply;
+	if (!IsValid(GESubclassToApply))
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Did not find GameplayEffect to Apply for tag [%s] - is it missing from the DataAsset inheriting from UDamageTypeConfig? No GameplayEffect will be applied"), 
+											TEXT(__FUNCSIG__),
+											*DamageTypeTag.ToString());
+		return;
+	}
+
+	FGameplayEffectSpecHandle SpecHandle = Source->MakeOutgoingSpec(GESubclassToApply, /*Level*/1, Source->MakeEffectContext());
+	for (const FGameplayEffectParameterType& RelevantAttributeForGameplayEffect : DamageTypeConfig->RelevantAttributesForGameplayEffect)
+	{
+		const float AttributeValueToSet = Source->GetNumericAttribute(*GameplayTagsToGameplayAttributesConverter->GetAttributeForGameplayTag(RelevantAttributeForGameplayEffect.Tag));
+		switch (RelevantAttributeForGameplayEffect.ParameterType)
+		{
+		case EGameplayEffectParameterType::Duration:
+		{
+			SpecHandle.Data->SetDuration(AttributeValueToSet, /*bLockDuration*/ true);
+			break;
+		}
+		case EGameplayEffectParameterType::Period:
+		{
+			SpecHandle.Data->Period = AttributeValueToSet;
+			break;
+		}
+		case EGameplayEffectParameterType::SetByCaller:
+		{
+			SpecHandle.Data->SetSetByCallerMagnitude(RelevantAttributeForGameplayEffect.Tag, AttributeValueToSet);
+			break;
+		}
+		}
+
+	}
+
+	Source->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data, Target);
 }
 
 void UUISubsystem::FindRarityToColorConfig()
@@ -98,7 +156,28 @@ void UUISubsystem::FindDamageTypeConfigs()
 		TSoftObjectPtr<UDamageTypeConfig> DamageTypeConfigSoftPtr = TSoftObjectPtr<UDamageTypeConfig>(DamageTypeConfigAsset.GetSoftObjectPath());
 		if (UDamageTypeConfig* DamageTypeConfig = DamageTypeConfigSoftPtr.LoadSynchronous(); IsValid(DamageTypeConfig))
 		{
-			DamageTypeTagToGameplayEffectToApply.Add({ DamageTypeConfig->DamageTypeTag, DamageTypeConfig });
+			DamageTypeTagToGameplayEffectToApply.Add({ DamageTypeConfig->Tag, DamageTypeConfig });
 		}
 	}
+}
+
+void UUISubsystem::FindGameplayTagsToGameplayAttributesConfig()
+{
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+	TArray<FAssetData> GameplayTagToAttributeConverterAssets;
+	AssetRegistryModule.Get().GetAssetsByClass(UGameplayTagToAttributeConverter::StaticClass()->GetClassPathName(), GameplayTagToAttributeConverterAssets);
+
+	if (GameplayTagToAttributeConverterAssets.IsEmpty())
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - No GameplayTagToAttributeConfig found - won't be able to apply some perk effects\nDo we have any assets inheriting from UGameplayTagToAttributeConfig?"), TEXT(__FUNCSIG__));
+		return;
+	}
+	else if (GameplayTagToAttributeConverterAssets.Num() > 1)
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Found more than 1 possible config for UGameplayTagToAttributeConfig, will use [%s]"), TEXT(__FUNCSIG__), *GameplayTagToAttributeConverterAssets[0].GetFullName());
+	}
+
+	TSoftObjectPtr<UGameplayTagToAttributeConverter> GameplayTagToAttributeConverterSoftPtr = TSoftObjectPtr<UGameplayTagToAttributeConverter>(GameplayTagToAttributeConverterAssets[0].GetSoftObjectPath());
+	GameplayTagsToGameplayAttributesConverter = GameplayTagToAttributeConverterSoftPtr.LoadSynchronous();
 }

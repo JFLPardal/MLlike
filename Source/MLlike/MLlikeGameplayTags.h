@@ -14,6 +14,10 @@ namespace MLlikeGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_Shooting_FireDuration);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_Shooting_FirePeriod);
 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_MeleeCombo_FirstStepDamage);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_MeleeCombo_SecondStepDamage);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_MeleeCombo_ThirdStepDamage);
+
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Attribute_BaseHealth_MaxHealth);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_MLlike_Effects_AddMaxAmmo);

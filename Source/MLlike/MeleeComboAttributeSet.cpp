@@ -10,6 +10,9 @@ UMeleeComboAttributeSet::UMeleeComboAttributeSet()
 	InitFirstStepDamage(1.0f);
 	InitSecondStepDamage(2.0f);
 	InitThirdStepDamage(5.0f);
+
+	//InitCurseTimer(2.0f);
+	//InitCurseDamage(0.0f);
 }
 
 float UMeleeComboAttributeSet::GetDamageForStep(EMeleeComboStep Step) const

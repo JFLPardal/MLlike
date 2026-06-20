@@ -25,6 +25,8 @@ public:
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, ShootingFireDamage);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, ShootingFireDuration);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, ShootingFirePeriod);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, CurseTimer);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, CurseDamage);
 
 	UShootingAttributeSet();
 
@@ -55,6 +57,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData ShootingFirePeriod;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData CurseTimer;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData CurseDamage;
 
 private:
 	void UpdateOutOfAmmo();

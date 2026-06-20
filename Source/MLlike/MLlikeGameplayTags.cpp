@@ -17,6 +17,8 @@ namespace MLlikeGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Attribute_MeleeCombo_FirstStepDamage, "MeleeComboAttributeSet.FirstStepDamage");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Attribute_MeleeCombo_SecondStepDamage, "MeleeComboAttributeSet.SecondStepDamage");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Attribute_MeleeCombo_ThirdStepDamage, "MeleeComboAttributeSet.ThirdStepDamage");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Attribute_MeleeCombo_CurseTimer, "MeleeComboAttributeSet.CurseTimer");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Attribute_MeleeCombo_CurseDamage, "MeleeComboAttributeSet.CurseDamage");
 
 	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Attribute_BaseHealth_MaxHealth, "BaseHealthAttributeSet.MaxHealth");
 

@@ -52,7 +52,7 @@ FColor UUISubsystem::GetColorForRarity(ERarity Rarity) const
 {
 	return RarityToColorConfig->GetColorForRarity(Rarity);
 }
-
+UE_DISABLE_OPTIMIZATION
 void UUISubsystem::ApplyGameplayEffectForDamageType(FGameplayTag DamageTypeTag, UAbilitySystemComponent* const Source, UAbilitySystemComponent* const Target)
 {
 	if (!IsValid(Source))
@@ -181,3 +181,5 @@ void UUISubsystem::FindGameplayTagsToGameplayAttributesConfig()
 	TSoftObjectPtr<UGameplayTagToAttributeConverter> GameplayTagToAttributeConverterSoftPtr = TSoftObjectPtr<UGameplayTagToAttributeConverter>(GameplayTagToAttributeConverterAssets[0].GetSoftObjectPath());
 	GameplayTagsToGameplayAttributesConverter = GameplayTagToAttributeConverterSoftPtr.LoadSynchronous();
 }
+
+UE_ENABLE_OPTIMIZATION

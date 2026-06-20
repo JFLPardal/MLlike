@@ -25,6 +25,9 @@ class MLLIKE_API UMeleeComboAttributeSet : public UAttributeSet
 	ATTRIBUTE_ACCESSORS_BASIC(UMeleeComboAttributeSet, FirstStepDamage)
 	ATTRIBUTE_ACCESSORS_BASIC(UMeleeComboAttributeSet, SecondStepDamage)
 	ATTRIBUTE_ACCESSORS_BASIC(UMeleeComboAttributeSet, ThirdStepDamage)
+
+	//ATTRIBUTE_ACCESSORS_BASIC(UMeleeComboAttributeSet, CurseTimer)
+	//ATTRIBUTE_ACCESSORS_BASIC(UMeleeComboAttributeSet, CurseDamage)
 		
 public:
 	UMeleeComboAttributeSet();
@@ -41,4 +44,10 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData ThirdStepDamage;
+	/*
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData CurseTimer;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData CurseDamage;*/
 };

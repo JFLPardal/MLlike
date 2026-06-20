@@ -18,6 +18,10 @@ UShootingAttributeSet::UShootingAttributeSet()
 	InitShootingFireDamage(0.0f);
 	InitShootingFireDuration(0.0f);
 	InitShootingFirePeriod(0.0f);
+
+
+	InitCurseTimer(2.0f);
+	InitCurseDamage(0.0f);
 }
 
 void UShootingAttributeSet::InitDependentAttributes()

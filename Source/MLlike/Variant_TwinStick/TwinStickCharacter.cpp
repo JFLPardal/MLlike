@@ -12,6 +12,7 @@
 #include "TwinStickProjectile.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "MeleeComboAttributeSet.h"
 #include "MLLikeAbilitySystemComponent.h"
 #include "MLlikeGameplayTags.h"
 #include "ShootingAttributeSet.h"
@@ -50,6 +51,7 @@ ATwinStickCharacter::ATwinStickCharacter()
 	ASC = CreateDefaultSubobject< UMLLikeAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 
 	ShootingAttributeSet = CreateDefaultSubobject<UShootingAttributeSet>(TEXT("ShootingAttributeSet"));
+	MeleeComboAttributeSet = CreateDefaultSubobject<UMeleeComboAttributeSet>(TEXT("MeleeComboAttributeSet"));
 }
 
 UAbilitySystemComponent* ATwinStickCharacter::GetAbilitySystemComponent() const

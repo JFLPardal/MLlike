@@ -69,6 +69,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UEnemyDefinitionDataAsset> m_DefinitionAsset = nullptr;
+
 public:
 
 	/** If true, this NPC has already been hit by a projectile and is being destroyed. Exposed to BP so it can be read by StateTree */

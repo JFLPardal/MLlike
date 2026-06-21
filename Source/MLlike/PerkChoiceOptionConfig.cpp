@@ -19,7 +19,7 @@ FText UPerkChoiceOptionConfig::GetDescription() const
 	return FText::Format(Description, Args);
 }
 
-int32 FPerkParameter::GetMagnitudeForRarity(ERarity Rarity) const
+float FPerkParameter::GetMagnitudeForRarity(ERarity Rarity) const
 {
 	for (const FRarityToValue& RarityToValueEntry : MagnitudePerRarity)
 	{
@@ -31,7 +31,7 @@ int32 FPerkParameter::GetMagnitudeForRarity(ERarity Rarity) const
 
 	UE_LOG(LogMLlikeGeneral, Error, TEXT("Requesting Magnitude for an unspecified Rarity for PerkParameter with Description Text [%s]. Common rarity will be used"), *DescriptionArgumentName.ToString());
 
-	return 1;
+	return 1.0f;
 }
 
 EDataValidationResult UPerkChoiceOptionConfig::IsDataValid(class FDataValidationContext& Context) const
@@ -51,8 +51,8 @@ EDataValidationResult UPerkChoiceOptionConfig::IsDataValid(class FDataValidation
 	TSet<ERarity> PerkParametersRarities;
 	for (const FPerkParameter& PerkParameter : PerkParameters)
 	{
-		// PerkParameter.DataTag validation 
-		if (!PerkParameter.DataTag.IsValid())
+		// PerkParameter.AttributeToModifyAsTag validation 
+		if (!PerkParameter.AttributeToModifyAsTag.IsValid())
 		{
 			Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid tag set in PerkParameters for [%s] - Did you forget to add a tag?"),
 																	*GetName())));
@@ -61,11 +61,11 @@ EDataValidationResult UPerkChoiceOptionConfig::IsDataValid(class FDataValidation
 		else
 		{
 			bool bDataTagAlreadyDefined = false;
-			PerkParamatersDataTags.Add(PerkParameter.DataTag, &bDataTagAlreadyDefined);
+			PerkParamatersDataTags.Add(PerkParameter.AttributeToModifyAsTag, &bDataTagAlreadyDefined);
 			if(bDataTagAlreadyDefined)
 			{
 				Context.AddError(FText::FromString(FString::Printf(TEXT("Adding duplicated tag [%s] to [%s] - Please remove duplicate"),
-																		*PerkParameter.DataTag.ToString(),
+																		*PerkParameter.AttributeToModifyAsTag.ToString(),
 																		*GetName())));
 				Result = EDataValidationResult::Invalid;
 			}
@@ -98,9 +98,9 @@ EDataValidationResult UPerkChoiceOptionConfig::IsDataValid(class FDataValidation
 			PerkParametersRarities.Add(MagnitudePerRarity.Rarity, &bRarityAlreadyDefined);
 			if (bRarityAlreadyDefined)
 			{
-				Context.AddError(FText::FromString(FString::Printf(TEXT("Adding duplicated Rarity [%s] in MagnitudePerRarity for PerkParameters with DataTag [%s] on [%s] - Please remove duplicate"),
+				Context.AddError(FText::FromString(FString::Printf(TEXT("Adding duplicated Rarity [%s] in MagnitudePerRarity for PerkParameters with AttributeToModifyAsTag [%s] on [%s] - Please remove duplicate"),
 																		*StaticEnum<ERarity>()->GetDisplayNameTextByValue(static_cast<uint64>(MagnitudePerRarity.Rarity)).ToString(),
-																		*PerkParameter.DataTag.ToString(),
+																		*PerkParameter.AttributeToModifyAsTag.ToString(),
 																		*GetName())));
 				Result = EDataValidationResult::Invalid;
 			}
@@ -110,9 +110,9 @@ EDataValidationResult UPerkChoiceOptionConfig::IsDataValid(class FDataValidation
 		{
 			if (const bool bRarityMissing = PerkParametersRarities.Remove(RarityEntry) == 0)
 			{
-				Context.AddError(FText::FromString(FString::Printf(TEXT("Rarity [%s] is missing in MagnitudePerRarity for PerkParameter with DataTag [%s] on [%s]. Please add the missing rarity"),
+				Context.AddError(FText::FromString(FString::Printf(TEXT("Rarity [%s] is missing in MagnitudePerRarity for PerkParameter with AttributeToModifyAsTag [%s] on [%s]. Please add the missing rarity"),
 																		*StaticEnum<ERarity>()->GetDisplayNameTextByValue(static_cast<uint64>(RarityEntry)).ToString(),
-																		*PerkParameter.DataTag.ToString(),
+																		*PerkParameter.AttributeToModifyAsTag.ToString(),
 																		*GetName())));
 				Result = EDataValidationResult::Invalid;
 			}
@@ -128,10 +128,10 @@ EDataValidationResult UPerkChoiceOptionConfig::IsDataValid(class FDataValidation
 			FGameplayTag ModifierDataTag = Modifier.ModifierMagnitude.GetSetByCallerFloat().DataTag;
 			if (!PerkParamatersDataTags.Remove(ModifierDataTag))
 			{
-				Context.AddError(FText::FromString(FString::Printf(TEXT("PerkParamatersDataTags in [%s] is not specifying tag needed [%s] for [%s] - please add it"),
-																		*GetName(), 
-																		*ModifierDataTag.ToString(), 
-																		*GameplayEffectToGrant->GetName())));
+				Context.AddError(FText::FromString(FString::Printf(TEXT("Gameplay Effect [%s] doesn't specify 'Modifier Magnitude > Set By Callse Magnitude > DataTag' for attribute [%s] in [%s] - please add it"),
+																		*GameplayEffectToGrant->GetName(),
+																		*Modifier.Attribute.AttributeName,
+																		*GetName())));
 				Result = EDataValidationResult::Invalid;
 			}
 		}

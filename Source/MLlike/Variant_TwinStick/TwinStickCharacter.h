@@ -15,6 +15,7 @@ class UAnimMontage;
 class UCameraComponent;
 class UGameplayEffect;
 class UInputAction;
+class UMeleeComboAttributeSet;
 class UMLLikeAbilitySystemComponent;
 class UShootingAttributeSet;
 class USpringArmComponent;
@@ -109,7 +110,10 @@ protected:
 	TObjectPtr<UMLLikeAbilitySystemComponent> ASC;
 
 	UPROPERTY()
-	TObjectPtr<UShootingAttributeSet> ShootingAttributeSet;
+	TObjectPtr<UShootingAttributeSet> ShootingAttributeSet = nullptr;
+	
+	UPROPERTY()
+	TObjectPtr<UMeleeComboAttributeSet> MeleeComboAttributeSet = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=ShootingAttributeSet, meta=(UIMin=1, UIMax=10, ClampMin=1, ClampMax=10))
 	int32 MaxInitialAmmo = 4;

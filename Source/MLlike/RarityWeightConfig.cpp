@@ -20,7 +20,7 @@ ERarity URarityWeightConfig::GetRandomRarity() const
 	{
 		if (RandomNumber < RarityWeight.Value + AccumulatedWeight)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Rarity %d"), RarityWeight.Rarity);
+			UE_LOG(LogTemp, Warning, TEXT("Rarity %s"), *StaticEnum<ERarity>()->GetDisplayNameTextByValue(static_cast<uint64>(RarityWeight.Rarity)).ToString());
 			return RarityWeight.Rarity;
 		}
 		AccumulatedWeight += RarityWeight.Value;

@@ -22,6 +22,13 @@ public:
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxAmmo);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, Energy);
 	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, MaxEnergy);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, ShootingFireDamage);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, ShootingFireDuration);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, ShootingFirePeriod);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, CurseTimer);
+	ATTRIBUTE_ACCESSORS_BASIC(UShootingAttributeSet, CurseDamage);
+
+	UShootingAttributeSet();
 
 	void InitDependentAttributes();
 
@@ -41,6 +48,21 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData EnergyCostPerShot;
+
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData ShootingFireDamage;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData ShootingFireDuration;
+
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData ShootingFirePeriod;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData CurseTimer;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData CurseDamage;
 
 private:
 	void UpdateOutOfAmmo();

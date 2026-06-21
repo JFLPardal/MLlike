@@ -16,8 +16,8 @@ struct FPerkParameter
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	FGameplayTag DataTag;
-	
+	FGameplayTag AttributeToModifyAsTag;
+
 	UPROPERTY(EditAnywhere)
 	FName DescriptionArgumentName;
 
@@ -25,7 +25,7 @@ struct FPerkParameter
 	TArray<FRarityToValue> MagnitudePerRarity{ {ERarity::Common, 1}, {ERarity::Rare, 1}, {ERarity::Epic, 1}, {ERarity::Legendary, 1} };
 
 
-	int32 GetMagnitudeForRarity(ERarity Rarity) const;
+	float GetMagnitudeForRarity(ERarity Rarity) const;
 };
 
 /**
@@ -54,7 +54,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> GameplayEffectToGrant;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (TitleProperty = "AttributeToModifyAsTag"))
 	TArray<FPerkParameter> PerkParameters;
 
 public:

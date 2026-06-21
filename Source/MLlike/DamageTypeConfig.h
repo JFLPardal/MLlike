@@ -29,6 +29,24 @@ struct FGameplayEffectParameterType
 	EGameplayEffectParameterType ParameterType;
 };
 
+USTRUCT(BlueprintType)
+struct FDamageTypeUIConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UI")
+	TObjectPtr<UTexture2D> Icon = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UI")
+	FColor IconColor = FColor::Magenta;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UI")
+	FColor TextShadowColor = FColor::Magenta;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UI")
+	FColor TextOutlineColor = FColor::Magenta;
+};
+
 UCLASS()
 class MLLIKE_API UDamageTypeConfig : public UPrimaryDataAsset
 {
@@ -43,6 +61,9 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (TitleProperty = "Tag"))
 	TArray<FGameplayEffectParameterType> RelevantAttributesForGameplayEffect;
+
+	UPROPERTY(EditAnywhere, Category="UI")
+	FDamageTypeUIConfig UIConfig;
 
 public:
 #if WITH_EDITOR

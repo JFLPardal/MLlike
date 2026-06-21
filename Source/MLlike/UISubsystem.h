@@ -11,6 +11,7 @@ class UAbilitySystemComponent;
 class UDamageTypeConfig;
 struct FChoiceScreenWidgetConfig;
 class UChoiceScreenWidget;
+struct FDamageTypeUIConfig;
 class UGameplayEffect;
 class UGameplayTagToAttributeConverter;
 class UUIRootWidget;
@@ -38,6 +39,11 @@ public:
 	// TODO move
 	UFUNCTION(BlueprintCallable)
 	void ApplyGameplayEffectForDamageType(FGameplayTag DamageTypeTag, UAbilitySystemComponent* const Source, UAbilitySystemComponent* const Target);
+	
+	// TODO move
+	// returns true if DamageTypeTag exists
+	UFUNCTION(BlueprintCallable)
+	bool GetUIConfigForDamageType(FGameplayTag DamageTypeTag, FDamageTypeUIConfig& UIConfig) const;
 
 private:
 	void FindRarityToColorConfig();

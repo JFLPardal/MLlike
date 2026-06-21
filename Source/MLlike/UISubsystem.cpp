@@ -52,7 +52,7 @@ FColor UUISubsystem::GetColorForRarity(ERarity Rarity) const
 {
 	return RarityToColorConfig->GetColorForRarity(Rarity);
 }
-UE_DISABLE_OPTIMIZATION
+
 void UUISubsystem::ApplyGameplayEffectForDamageType(FGameplayTag DamageTypeTag, UAbilitySystemComponent* const Source, UAbilitySystemComponent* const Target)
 {
 	if (!IsValid(Source))
@@ -71,8 +71,8 @@ void UUISubsystem::ApplyGameplayEffectForDamageType(FGameplayTag DamageTypeTag, 
 		return;
 	}
 
-	const UDamageTypeConfig* const DamageTypeConfig = *DamageTypeTagToGameplayEffectToApply.Find(DamageTypeTag);
-	if (!IsValid(DamageTypeConfig))
+	const UDamageTypeConfig* const* DamageTypeConfig = DamageTypeTagToGameplayEffectToApply.Find(DamageTypeTag);
+	if (DamageTypeConfig == nullptr)
 	{
 		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Can't find UDamageTypeConfig for damage type tag [%s]. No GameplayEffect will be applied"),
 											TEXT(__FUNCSIG__),
@@ -80,7 +80,7 @@ void UUISubsystem::ApplyGameplayEffectForDamageType(FGameplayTag DamageTypeTag, 
 		return;
 	}
 	
-	TSubclassOf<UGameplayEffect> GESubclassToApply = DamageTypeConfig->EffectToApply;
+	TSubclassOf<UGameplayEffect> GESubclassToApply = (*DamageTypeConfig)->EffectToApply;
 	if (!IsValid(GESubclassToApply))
 	{
 		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Did not find GameplayEffect to Apply for tag [%s] - is it missing from the DataAsset inheriting from UDamageTypeConfig? No GameplayEffect will be applied"), 
@@ -90,31 +90,54 @@ void UUISubsystem::ApplyGameplayEffectForDamageType(FGameplayTag DamageTypeTag, 
 	}
 
 	FGameplayEffectSpecHandle SpecHandle = Source->MakeOutgoingSpec(GESubclassToApply, /*Level*/1, Source->MakeEffectContext());
-	for (const FGameplayEffectParameterType& RelevantAttributeForGameplayEffect : DamageTypeConfig->RelevantAttributesForGameplayEffect)
+	for (const FGameplayEffectParameterType& RelevantAttributeForGameplayEffect : (*DamageTypeConfig)->RelevantAttributesForGameplayEffect)
 	{
-		const float AttributeValueToSet = Source->GetNumericAttribute(*GameplayTagsToGameplayAttributesConverter->GetAttributeForGameplayTag(RelevantAttributeForGameplayEffect.Tag));
-		switch (RelevantAttributeForGameplayEffect.ParameterType)
+		const FGameplayAttribute* const AttributeForGameplayTag = GameplayTagsToGameplayAttributesConverter->GetAttributeForGameplayTag(RelevantAttributeForGameplayEffect.Tag);
+		if (AttributeForGameplayTag == nullptr)
 		{
-		case EGameplayEffectParameterType::Duration:
+			UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - what to write here? No GameplayEffect will be applied"),
+				TEXT(__FUNCSIG__));
+		}
+		else
 		{
-			SpecHandle.Data->SetDuration(AttributeValueToSet, /*bLockDuration*/ true);
-			break;
+			const float AttributeValueToSet = Source->GetNumericAttribute(*AttributeForGameplayTag);
+			switch (RelevantAttributeForGameplayEffect.ParameterType)
+			{
+			case EGameplayEffectParameterType::Duration:
+			{
+				SpecHandle.Data->SetDuration(AttributeValueToSet, /*bLockDuration*/ true);
+				break;
+			}
+			case EGameplayEffectParameterType::Period:
+			{
+				SpecHandle.Data->Period = AttributeValueToSet;
+				break;
+			}
+			case EGameplayEffectParameterType::SetByCaller:
+			{
+				SpecHandle.Data->SetSetByCallerMagnitude(RelevantAttributeForGameplayEffect.Tag, AttributeValueToSet);
+				break;
+			}
+			}
 		}
-		case EGameplayEffectParameterType::Period:
-		{
-			SpecHandle.Data->Period = AttributeValueToSet;
-			break;
-		}
-		case EGameplayEffectParameterType::SetByCaller:
-		{
-			SpecHandle.Data->SetSetByCallerMagnitude(RelevantAttributeForGameplayEffect.Tag, AttributeValueToSet);
-			break;
-		}
-		}
-
 	}
 
 	Source->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data, Target);
+}
+
+bool UUISubsystem::GetUIConfigForDamageType(FGameplayTag DamageTypeTag, FDamageTypeUIConfig& UIConfig) const
+{
+	const UDamageTypeConfig* const* DamageTypeConfig = DamageTypeTagToGameplayEffectToApply.Find(DamageTypeTag);
+	if (DamageTypeConfig == nullptr)
+	{
+		UE_LOG(LogMLlikeGeneral, Error, TEXT("%s - Can't find UDamageTypeConfig for damage type tag [%s]. UIConfig for damage type cannot be retrieved"),
+			TEXT(__FUNCSIG__),
+			*DamageTypeTag.ToString());
+		return false;
+	}
+
+	UIConfig = (*DamageTypeConfig)->UIConfig;
+	return true;
 }
 
 void UUISubsystem::FindRarityToColorConfig()
@@ -181,5 +204,3 @@ void UUISubsystem::FindGameplayTagsToGameplayAttributesConfig()
 	TSoftObjectPtr<UGameplayTagToAttributeConverter> GameplayTagToAttributeConverterSoftPtr = TSoftObjectPtr<UGameplayTagToAttributeConverter>(GameplayTagToAttributeConverterAssets[0].GetSoftObjectPath());
 	GameplayTagsToGameplayAttributesConverter = GameplayTagToAttributeConverterSoftPtr.LoadSynchronous();
 }
-
-UE_ENABLE_OPTIMIZATION

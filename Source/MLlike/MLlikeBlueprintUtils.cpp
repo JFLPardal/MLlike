@@ -35,3 +35,13 @@ UActorComponent* UMLlikeBlueprintUtils::GetActorsFirstInterfaceOfType(TSubclassO
 
 	return Components[0];
 }
+
+FGameplayTag UMLlikeBlueprintUtils::GetDamageTypeTagFromGameplayCue(FGameplayTag GameplayCueDamageType)
+{
+	FString TagString = GameplayCueDamageType.ToString();
+
+	TagString.RemoveFromStart(TEXT("GameplayCue."));
+
+	FGameplayTag DamageTypeTag = FGameplayTag::RequestGameplayTag(FName(*TagString));
+	return DamageTypeTag;
+}

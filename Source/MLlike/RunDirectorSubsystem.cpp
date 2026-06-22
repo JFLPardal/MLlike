@@ -124,7 +124,10 @@ void URunDirectorSubsystem::HandleChoiceMade(const UChoiceOptionConfig* const Ch
 			*ChosenConfig->GetClass()->GetName());
 		return;
 	}
-
+	
+	// bad :(
+	UChoiceOptionConfig* ConfigToRemove = const_cast<UChoiceOptionConfig*>(ChosenConfig);
+	UnchosenPerks.Remove(ConfigToRemove);
 
 	if (UAbilitySystemComponent* const PlayerAbilitySystemComponent = MLlikeUtils::GetPlayerAbilitySystemComponent(GetGameInstance()->GetWorld()); IsValid(PlayerAbilitySystemComponent))
 	{

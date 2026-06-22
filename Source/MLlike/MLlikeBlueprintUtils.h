@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Templates/SubclassOf.h"
 #include "MLlikeBlueprintUtils.generated.h"
@@ -21,4 +22,7 @@ class MLLIKE_API UMLlikeBlueprintUtils : public UBlueprintFunctionLibrary
 	
 	UFUNCTION(BlueprintCallable)
 	static UActorComponent* GetActorsFirstInterfaceOfType(TSubclassOf<UInterface> Interface, AActor* const Actor);
+	
+	UFUNCTION(BlueprintCallable)
+	static FGameplayTag GetDamageTypeTagFromGameplayCue(FGameplayTag GameplayCueDamageType);
 };

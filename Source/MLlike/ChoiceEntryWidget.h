@@ -10,6 +10,7 @@
 
 class UChoiceOptionConfig;
 class UCommonTextBlock;
+class UCommonRichTextBlock;
 class UImage;
 
 DECLARE_DELEGATE_OneParam(FOnChosen, const UChoiceOptionConfig* const);
@@ -41,7 +42,7 @@ protected:
 	TObjectPtr<UCommonTextBlock> Name;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	TObjectPtr<UCommonTextBlock> Description;
+	TObjectPtr<UCommonRichTextBlock> Description;
 
 	UPROPERTY(BlueprintReadOnly)
 	ERarity Rarity;

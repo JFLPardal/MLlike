@@ -4,6 +4,7 @@
 #include "ChoiceEntryWidget.h"
 
 #include "ChoiceOptionConfig.h"
+#include "CommonRichTextBlock.h"
 #include "CommonTextBlock.h"
 #include "MLlikeLogCategories.h"
 #include "Components/Image.h"

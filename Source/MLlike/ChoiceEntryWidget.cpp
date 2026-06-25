@@ -6,6 +6,7 @@
 #include "ChoiceOptionConfig.h"
 #include "CommonRichTextBlock.h"
 #include "CommonTextBlock.h"
+#include "MLlikeButton.h"
 #include "MLlikeLogCategories.h"
 #include "Components/Image.h"
 
@@ -24,12 +25,12 @@ void UChoiceEntryWidget::InitializeWithConfig(const UChoiceOptionConfig* const C
 
 	Config = ChoiceConfig;
 	
+	Button->OnClicked().AddUObject(this, &UChoiceEntryWidget::HandleButtonClicked);
+
 	BP_Initialize();
 }
 
 void UChoiceEntryWidget::HandleButtonClicked()
 {
-	Super::HandleButtonClicked();
-
 	OnChosen.ExecuteIfBound(Config);
 }

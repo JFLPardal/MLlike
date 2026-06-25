@@ -58,7 +58,10 @@ void UChoiceScreenWidget::Cleanup()
 {
 	OnChoiceMade.Unbind();
 	bChoicesInitialized = false;
-	m_ChoicesList->ClearChildren();
+	if (IsValid(m_ChoicesList))
+	{
+		m_ChoicesList->ClearChildren();
+	}
 }
 
 void UChoiceScreenWidget::NativeOnDeactivated()

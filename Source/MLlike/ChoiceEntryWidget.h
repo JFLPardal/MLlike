@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CommonButtonBase.h"
+#include "CommonUserWidget.h"
 #include "RarityEnum.h"
 #include "ChoiceEntryWidget.generated.h"
-
 
 class UChoiceOptionConfig;
 class UCommonTextBlock;
 class UCommonRichTextBlock;
 class UImage;
+class UMLlikeButton;
 
 DECLARE_DELEGATE_OneParam(FOnChosen, const UChoiceOptionConfig* const);
 
@@ -19,7 +19,7 @@ DECLARE_DELEGATE_OneParam(FOnChosen, const UChoiceOptionConfig* const);
  * 
  */
 UCLASS()
-class MLLIKE_API UChoiceEntryWidget : public UCommonButtonBase
+class MLLIKE_API UChoiceEntryWidget : public UCommonUserWidget
 {
 	GENERATED_BODY()
 
@@ -29,8 +29,6 @@ public:
 	FOnChosen OnChosen;
 
 protected:
-	virtual void HandleButtonClicked() override;
-
 	UFUNCTION(BlueprintImplementableEvent)
 	void BP_Initialize();
 
@@ -44,8 +42,14 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UCommonRichTextBlock> Description;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<UMLlikeButton> Button;
+
 	UPROPERTY(BlueprintReadOnly)
 	ERarity Rarity;
 
 	TObjectPtr<const UChoiceOptionConfig> Config;
+
+private:
+	void HandleButtonClicked();
 };

@@ -21,3 +21,13 @@ FColor URarityToColorConfig::GetColorForRarity(ERarity Rarity) const
 
 	return FColor::White;
 }
+
+TSubclassOf<UCommonTextStyle> URarityToColorConfig::GetTextStyleForRarity(ERarity Rarity) const
+{
+	if (const FRarityToColorEntry* const MatchedRarity = RarityToColor.FindByPredicate([Rarity](const FRarityToColorEntry& Entry) { return Entry.Rarity == Rarity; }))
+	{
+		return MatchedRarity->TextStyle;
+	}
+
+	return nullptr;
+}

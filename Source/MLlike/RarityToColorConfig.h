@@ -7,6 +7,8 @@
 #include "RarityEnum.h"
 #include "RarityToColorConfig.generated.h"
 
+class UCommonTextStyle;
+
 USTRUCT(BlueprintType)
 struct FRarityToColorEntry
 {
@@ -17,6 +19,9 @@ struct FRarityToColorEntry
 
 	UPROPERTY(EditAnywhere)
 	FColor Color;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UCommonTextStyle> TextStyle;
 };
 
 /**
@@ -35,4 +40,6 @@ public:
 	URarityToColorConfig();
 
 	FColor GetColorForRarity(ERarity Rarity) const;
+
+	TSubclassOf<UCommonTextStyle> GetTextStyleForRarity(ERarity Rarity) const;
 };

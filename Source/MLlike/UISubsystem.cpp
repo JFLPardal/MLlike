@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "CommonTextBlock.h"
 #include "DamageTypeConfig.h"
 #include "GameplayTagToAttributeConfig.h"
 #include "Kismet/GameplayStatics.h"
@@ -46,6 +47,11 @@ UChoiceScreenWidget* UUISubsystem::ShowChoiceSelectionScreen(const FChoiceScreen
 	}
 
 	return nullptr;
+}
+
+TSubclassOf<UCommonTextStyle> UUISubsystem::GetTextStyleForRarity(ERarity Rarity) const
+{
+	return RarityToColorConfig->GetTextStyleForRarity(Rarity);
 }
 
 FColor UUISubsystem::GetColorForRarity(ERarity Rarity) const

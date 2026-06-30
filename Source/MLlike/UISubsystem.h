@@ -33,6 +33,11 @@ public:
 
 	UChoiceScreenWidget* ShowChoiceSelectionScreen(const FChoiceScreenWidgetConfig& Config);
 
+	// TODO move
+	UFUNCTION(BlueprintCallable)
+	TSubclassOf<UCommonTextStyle> GetTextStyleForRarity(ERarity Rarity) const;
+
+	// TODO move
 	UFUNCTION(BlueprintCallable)
 	FColor GetColorForRarity(ERarity Rarity) const;
 

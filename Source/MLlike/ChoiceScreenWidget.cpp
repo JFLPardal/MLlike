@@ -31,16 +31,18 @@ void UChoiceScreenWidget::InitializeWithConfig(const FChoiceScreenWidgetConfig& 
 		return;
 	}
 
+	int32 OptionNumber = 1;
 	for (UChoiceOptionConfig const* const ChoiceOptionConfig : Config.ChoicesToShow)
 	{
 		if (IsValid(ChoiceOptionConfig))
 		{
 			UChoiceEntryWidget* const ChoiceEntryWidget = CreateWidget<UChoiceEntryWidget>(this, Config.ChoiceEntryWidgetClass);
 			ChoiceEntryWidget->SetPadding(PaddingForEntries);
-			ChoiceEntryWidget->InitializeWithConfig(ChoiceOptionConfig);
+			ChoiceEntryWidget->InitializeWithConfigAndDelayShowing(ChoiceOptionConfig, OptionNumber * ShowChoiceOptionInterval);
 			ChoiceEntryWidget->OnChosen.BindUObject(this, &UChoiceScreenWidget::HandleOnChoiceMade);
 
 			m_ChoicesList->AddChild(ChoiceEntryWidget);
+			OptionNumber++;
 		}
 	}
 

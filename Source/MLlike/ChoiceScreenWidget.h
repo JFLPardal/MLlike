@@ -50,13 +50,16 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UPanelWidget> m_ChoicesList = nullptr;
 
-	UPROPERTY(EditAnywhere, Category="DesignerViewTesting")
+	UPROPERTY(EditAnywhere)
 	FMargin PaddingForEntries { 0, 5 };
 
 	bool bChoicesInitialized = false;
 
 	UPROPERTY(EditAnywhere, Category="DesignerViewTesting")
 	FChoiceScreenWidgetConfig DesignerTestingConfig;
+
+	UPROPERTY(EditAnywhere, meta=(Units="Seconds", UIMin=0.0f, UIMax=3.0f, ClampMin=0.0f, ClampMax=3.0f))
+	float ShowChoiceOptionInterval = 1.0f;
 
 private:
 	void HandleOnChoiceMade(const UChoiceOptionConfig* const ChosenConfig);

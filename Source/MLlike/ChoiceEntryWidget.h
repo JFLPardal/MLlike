@@ -23,14 +23,17 @@ class MLLIKE_API UChoiceEntryWidget : public UCommonUserWidget
 {
 	GENERATED_BODY()
 
-public:
-	void InitializeWithConfig(const UChoiceOptionConfig* const ChoiceConfig);
+public:	
+	void InitializeWithConfigAndDelayShowing(const UChoiceOptionConfig* const ChoiceConfig, float DelayInSecs);
 
 	FOnChosen OnChosen;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void BP_Initialize();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_Show();
 
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
@@ -52,4 +55,7 @@ protected:
 
 private:
 	void HandleButtonClicked();
+
+private:
+	FTimerHandle ShowTimerHandle;
 };

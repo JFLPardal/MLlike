@@ -10,7 +10,7 @@
 #include "MLlikeLogCategories.h"
 #include "Components/Image.h"
 
-void UChoiceEntryWidget::InitializeWithConfig(const UChoiceOptionConfig* const ChoiceConfig)
+void UChoiceEntryWidget::InitializeWithConfigAndDelayShowing(const UChoiceOptionConfig* const ChoiceConfig, float DelayInSecs)
 {
 	if (!IsValid(ChoiceConfig))
 	{
@@ -26,6 +26,20 @@ void UChoiceEntryWidget::InitializeWithConfig(const UChoiceOptionConfig* const C
 	Config = ChoiceConfig;
 	
 	Button->OnClicked().AddUObject(this, &UChoiceEntryWidget::HandleButtonClicked);
+
+	if (!IsDesignTime())
+	{
+		//BP_Show will show at the right time
+		SetVisibility(ESlateVisibility::Hidden);
+	
+		GetWorld()->GetTimerManager().SetTimer(ShowTimerHandle, FTimerDelegate::CreateLambda([this]()
+			{
+				BP_Show();
+			}),
+			DelayInSecs,
+			/*bInLoop*/ false
+		);
+	}
 
 	BP_Initialize();
 }

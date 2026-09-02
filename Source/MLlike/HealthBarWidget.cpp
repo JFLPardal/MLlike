@@ -4,7 +4,7 @@
 #include "HealthBarWidget.h"
 
 #include "MLLikeAbilitySystemComponent.h"
-
+#include "HealthBarInitData.h"
 
 void UHealthBarWidget::Init(const FHealthBarInitData& InitData)
 {

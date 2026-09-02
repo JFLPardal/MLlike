@@ -46,7 +46,7 @@ protected:
 	TSubclassOf<ATwinStickNPCDestruction> DestructionProxyClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UWidgetComponent> HealthBarWidgetComponent;
+	TObjectPtr<UWidgetComponent> HUDComponent;
 
 	/** Time to wait after this NPC is hit before destroying it */
 	UPROPERTY(EditAnywhere, Category="Pickup", meta=(ClampMin = 0, ClampMax = 5, Units = "s"))

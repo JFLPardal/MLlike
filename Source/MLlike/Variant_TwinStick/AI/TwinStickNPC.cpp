@@ -7,12 +7,13 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
+#include "DamageableHUD.h"
 #include "EnemyDefinitionDataAsset.h"
 #include "EnemySpawningSubsystem.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayEffectTypes.h"
-#include "HealthBarWidget.h"
+#include "HealthBarInitData.h"
 #include "MLLikeAbilitySystemComponent.h"
 #include "MLlikeGameplayTags.h"
 #include "TimerManager.h"
@@ -46,8 +47,8 @@ ATwinStickNPC::ATwinStickNPC()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
-	HealthBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
-	HealthBarWidgetComponent->SetupAttachment(GetMesh());
+	HUDComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HUD"));
+	HUDComponent->SetupAttachment(GetMesh());
 
 	m_ASC = CreateDefaultSubobject<UMLLikeAbilitySystemComponent>(TEXT("ASC"));
 
@@ -95,10 +96,10 @@ void ATwinStickNPC::BeginPlay()
 
 		m_ASC->GetGameplayAttributeValueChangeDelegate(m_HealthAttributeSet->GetCurrentHealthAttribute()).AddUObject(this, &ATwinStickNPC::OnCurrentHealthChanged);
 
-		if (IsValid(HealthBarWidgetComponent))
+		if (IsValid(HUDComponent))
 		{
-			HealthBarWidgetComponent->InitWidget();
-			if (UHealthBarWidget* Widget = Cast<UHealthBarWidget>(HealthBarWidgetComponent->GetWidget()); IsValid(Widget))
+			HUDComponent->InitWidget();
+			if (UDamageableHUD* HUDWidget = Cast<UDamageableHUD>(HUDComponent->GetWidget()); IsValid(HUDWidget))
 			{
 				if(IsValid(m_HealthAttributeSet))
 				{
@@ -106,11 +107,13 @@ void ATwinStickNPC::BeginPlay()
 					InitData.m_ASC = m_ASC;
 					InitData.m_CurrentHealthAttribute = m_HealthAttributeSet->GetCurrentHealthAttribute();
 					InitData.m_MaxHealth = m_HealthAttributeSet->GetMaxHealth();
-					Widget->Init(InitData);
+					FDamageableHUDInitData HUDInitData;
+					HUDInitData.HealthBarInitData = InitData;
+					HUDWidget->Init(HUDInitData);
 				}
 			}
 
-			HealthBarWidgetComponent->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+			HUDComponent->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		}
 	}
 }

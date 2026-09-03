@@ -31,6 +31,10 @@ public:
 	void Init(const FDamageableHUDInitData& InitData);
 
 protected:
+	// TODO name?
+	void OnCurseApplied(const FGameplayTag Tag, int32 Count);
+
+protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UMLlikeWidget> CountdownEffect;
 	

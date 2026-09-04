@@ -8,6 +8,7 @@ namespace MLlikeGameplayTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(TAG_ActionTaken_Shot, "ActionTaken.Shot");
 	
+	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_StatusEffect, "StatusEffect");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_StatusEffect_Curse, "StatusEffect.Curse");
 
 	UE_DEFINE_GAMEPLAY_TAG(TAG_MLlike_Attribute_Shooting_MaxAmmo, "ShootingAttributeSet.MaxAmmo");

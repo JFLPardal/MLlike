@@ -3,24 +3,34 @@
 
 #include "DamageableHUD.h"
 
+#include "CountdownEffectWidget.h"
 #include "HealthBarInitData.h"
+#include "HealthBarWidget.h"
+#include "MLLikeAbilitySystemComponent.h"
 #include "MLlikeGameplayTags.h"
+#include "MLlikeLogCategories.h"
+#include "UISubsystem.h"
 
 void UDamageableHUD::Init(const FDamageableHUDInitData& InitData)
 {
+	OwnerASC = InitData.HealthBarInitData.m_ASC;
 	HealthBar->Init(InitData.HealthBarInitData);
 
-	InitData.HealthBarInitData.m_ASC->RegisterGameplayTagEvent(MLlikeGameplayTags::TAG_MLlike_StatusEffect_Curse).AddUObject(this, &UDamageableHUD::OnCurseApplied);
+	if (UUISubsystem* const Subsystem = GetGameInstance()->GetSubsystem<UUISubsystem>(); IsValid(Subsystem))
+	{
+		Subsystem->OnStatusEffectApplied.AddUObject(this, &UDamageableHUD::OnCountdownEffectApplied);
+	}
 }
 
-void UDamageableHUD::OnCurseApplied(const FGameplayTag Tag, int32 Count)
+void UDamageableHUD::OnCountdownEffectApplied(const FStatusEffectAppliedData& Data)
 {
-	if (Count == 1)
+	// TODO this is being called for dead enemies. Very strange. Maybe missing unsub? But why is this still alive? In the Outliner the enemies don't exist anymore
+	UE_LOG(LogTemp, Error, TEXT("OnStatusEffectApplied called for %s"), *OwnerASC->GetOwner()->GetActorNameOrLabel());
+	if (Data.ASC == OwnerASC)
 	{
-		CountdownEffect->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-	}
-	else if (Count == 0)
-	{
-		CountdownEffect->SetVisibility(ESlateVisibility::Collapsed);
+		FCountdownEffectData CountdownEffectData;
+		CountdownEffectData.Tag = Data.Tag;
+		CountdownEffectData.Duration = Data.Duration;
+		CountdownEffect->SetEffectData(CountdownEffectData);
 	}
 }

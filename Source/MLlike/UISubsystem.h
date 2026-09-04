@@ -18,6 +18,23 @@ class UUIRootWidget;
 class URarityToColorConfig;
 enum class ERarity : uint8;
 
+USTRUCT()
+struct FStatusEffectAppliedData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> ASC;
+
+	UPROPERTY()
+	FGameplayTag Tag;
+
+	UPROPERTY()
+	float Duration;
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnStatusEffectApplied, const FStatusEffectAppliedData&);
+
 /**
  * 
  */
@@ -49,6 +66,8 @@ public:
 	// returns true if DamageTypeTag exists
 	UFUNCTION(BlueprintCallable)
 	bool GetUIConfigForDamageType(FGameplayTag DamageTypeTag, FDamageTypeUIConfig& UIConfig) const;
+
+	FOnStatusEffectApplied OnStatusEffectApplied;
 
 private:
 	void FindRarityToColorConfig();

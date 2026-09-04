@@ -9,6 +9,7 @@
 #include "DamageTypeConfig.h"
 #include "GameplayTagToAttributeConfig.h"
 #include "Kismet/GameplayStatics.h"
+#include "MLlikeGameplayTags.h"
 #include "MLlikeLogCategories.h"
 #include "RarityEnum.h"
 #include "RarityToColorConfig.h"
@@ -128,7 +129,21 @@ void UUISubsystem::ApplyGameplayEffectForDamageType(FGameplayTag DamageTypeTag, 
 		}
 	}
 
-	Source->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data, Target);
+	FActiveGameplayEffectHandle ActiveGEHandle = Source->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data, Target);
+	for(const FGameplayTag& Tag : SpecHandle.Data->Def->CachedGrantedTags)
+	{
+		if (Tag.MatchesTag(MLlikeGameplayTags::TAG_MLlike_StatusEffect))
+		{
+			if (const FActiveGameplayEffect* ActiveGE = Target->GetActiveGameplayEffect(ActiveGEHandle); ActiveGE)
+			{
+				FStatusEffectAppliedData StatusEffectAppliedData;
+				StatusEffectAppliedData.ASC = Target;
+				StatusEffectAppliedData.Tag = Tag;
+				StatusEffectAppliedData.Duration = ActiveGE->GetDuration();
+				OnStatusEffectApplied.Broadcast(StatusEffectAppliedData);
+			}
+		}
+	}
 }
 
 bool UUISubsystem::GetUIConfigForDamageType(FGameplayTag DamageTypeTag, FDamageTypeUIConfig& UIConfig) const

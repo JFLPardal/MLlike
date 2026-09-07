@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MLlikeWidget.h"
-#include "CountdownEffectWidget.generated.h"
+#include "TimedEffectWidget.generated.h"
 
 USTRUCT(BlueprintType)
 struct FCountdownEffectData
@@ -23,7 +23,7 @@ struct FCountdownEffectData
  *
  */
 UCLASS()
-class MLLIKE_API UCountdownEffectWidget : public UMLlikeWidget
+class MLLIKE_API UTimedEffectWidget : public UMLlikeWidget
 {
 	GENERATED_BODY()
 

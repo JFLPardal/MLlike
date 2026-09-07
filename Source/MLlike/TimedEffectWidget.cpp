@@ -1,20 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CountdownEffectWidget.h"
+#include "TimedEffectWidget.h"
 
-void UCountdownEffectWidget::SetEffectData(const FCountdownEffectData& Data)
+void UTimedEffectWidget::SetEffectData(const FCountdownEffectData& Data)
 {
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 	//The way this is implemented, assumes only 1 status effect will be shown on the HUD
 	if (!TimerManager.IsTimerActive(StatusEffectTimer))
 	{
-		TimerManager.SetTimer(StatusEffectTimer, this, &UCountdownEffectWidget::EffectWoreOff, Data.Duration);
+		TimerManager.SetTimer(StatusEffectTimer, this, &UTimedEffectWidget::EffectWoreOff, Data.Duration);
 		BP_EffectStarted(Data);
 	}
 }
 
-void UCountdownEffectWidget::EffectWoreOff()
+void UTimedEffectWidget::EffectWoreOff()
 {
 	BP_EffectWoreOff();
 }

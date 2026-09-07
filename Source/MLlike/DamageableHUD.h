@@ -7,7 +7,7 @@
 #include "HealthBarInitData.h"
 #include "DamageableHUD.generated.h"
 
-class UCountdownEffectWidget;
+class UTimedEffectWidget;
 class UMLLikeAbilitySystemComponent;
 class UHealthBarWidget;
 struct FStatusEffectAppliedData;
@@ -39,7 +39,7 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
-	TObjectPtr<UCountdownEffectWidget> CountdownEffect;
+	TObjectPtr<UTimedEffectWidget> TimedEffect;
 	
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UHealthBarWidget> HealthBar;

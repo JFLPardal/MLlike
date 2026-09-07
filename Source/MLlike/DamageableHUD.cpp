@@ -3,12 +3,12 @@
 
 #include "DamageableHUD.h"
 
-#include "CountdownEffectWidget.h"
 #include "HealthBarInitData.h"
 #include "HealthBarWidget.h"
 #include "MLLikeAbilitySystemComponent.h"
 #include "MLlikeGameplayTags.h"
 #include "MLlikeLogCategories.h"
+#include "TimedEffectWidget.h"
 #include "UISubsystem.h"
 
 void UDamageableHUD::Init(const FDamageableHUDInitData& InitData)
@@ -31,6 +31,6 @@ void UDamageableHUD::OnCountdownEffectApplied(const FStatusEffectAppliedData& Da
 		FCountdownEffectData CountdownEffectData;
 		CountdownEffectData.Tag = Data.Tag;
 		CountdownEffectData.Duration = Data.Duration;
-		CountdownEffect->SetEffectData(CountdownEffectData);
+		TimedEffect->SetEffectData(CountdownEffectData);
 	}
 }

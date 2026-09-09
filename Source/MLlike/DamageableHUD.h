@@ -37,6 +37,8 @@ protected:
 	// TODO if only 1 countdown effect is allowed at any given time, this could be moved to UCountdownEffectWidget
 	void OnCountdownEffectApplied(const FStatusEffectAppliedData& Data);
 
+	virtual void NativeDestruct() override;
+
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UTimedEffectWidget> TimedEffect;
@@ -46,4 +48,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UMLLikeAbilitySystemComponent> OwnerASC;
+
+private:
+	FDelegateHandle StatusEffectAppliedHandle;
 };

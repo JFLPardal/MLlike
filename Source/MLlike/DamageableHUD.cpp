@@ -18,14 +18,12 @@ void UDamageableHUD::Init(const FDamageableHUDInitData& InitData)
 
 	if (UUISubsystem* const Subsystem = GetGameInstance()->GetSubsystem<UUISubsystem>(); IsValid(Subsystem))
 	{
-		Subsystem->OnStatusEffectApplied.AddUObject(this, &UDamageableHUD::OnCountdownEffectApplied);
+		StatusEffectAppliedHandle = Subsystem->OnStatusEffectApplied.AddUObject(this, &UDamageableHUD::OnCountdownEffectApplied);
 	}
 }
 
 void UDamageableHUD::OnCountdownEffectApplied(const FStatusEffectAppliedData& Data)
 {
-	// TODO this is being called for dead enemies. Very strange. Maybe missing unsub? But why is this still alive? In the Outliner the enemies don't exist anymore
-	UE_LOG(LogTemp, Error, TEXT("OnStatusEffectApplied called for %s"), *OwnerASC->GetOwner()->GetActorNameOrLabel());
 	if (Data.ASC == OwnerASC)
 	{
 		FCountdownEffectData CountdownEffectData;
@@ -33,4 +31,14 @@ void UDamageableHUD::OnCountdownEffectApplied(const FStatusEffectAppliedData& Da
 		CountdownEffectData.Duration = Data.Duration;
 		TimedEffect->SetEffectData(CountdownEffectData);
 	}
+}
+
+void UDamageableHUD::NativeDestruct()
+{
+	if (UUISubsystem* const Subsystem = GetGameInstance()->GetSubsystem<UUISubsystem>(); IsValid(Subsystem))
+	{
+		Subsystem->OnStatusEffectApplied.Remove(StatusEffectAppliedHandle);
+	}
+
+	Super::NativeDestruct();
 }

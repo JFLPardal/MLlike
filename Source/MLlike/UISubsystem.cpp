@@ -138,7 +138,7 @@ void UUISubsystem::ApplyGameplayEffectForDamageType(FGameplayTag DamageTypeTag, 
 			{
 				FStatusEffectAppliedData StatusEffectAppliedData;
 				StatusEffectAppliedData.ASC = Target;
-				StatusEffectAppliedData.Tag = Tag;
+				StatusEffectAppliedData.Tag = (*DamageTypeConfig)->Tag;
 				StatusEffectAppliedData.Duration = ActiveGE->GetDuration();
 				OnStatusEffectApplied.Broadcast(StatusEffectAppliedData);
 			}

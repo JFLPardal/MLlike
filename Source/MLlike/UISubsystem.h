@@ -26,6 +26,7 @@ struct FStatusEffectAppliedData
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> ASC;
 
+	// should be the `DamageType` tag, not the `StatusEffect`
 	UPROPERTY()
 	FGameplayTag Tag;
 

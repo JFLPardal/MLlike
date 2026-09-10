@@ -37,7 +37,10 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
-	TObjectPtr<UImage> Icon;
+	TObjectPtr<UImage> PrimaryIcon;
+	
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	TObjectPtr<UImage> SecondaryIcon;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UCommonTextBlock> Name;

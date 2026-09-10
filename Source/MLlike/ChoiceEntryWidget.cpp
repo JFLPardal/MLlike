@@ -18,7 +18,12 @@ void UChoiceEntryWidget::InitializeWithConfigAndDelayShowing(const UChoiceOption
 		return;
 	}
 
-	Icon->SetBrushFromTexture(ChoiceConfig->Icon);
+	PrimaryIcon->SetBrushFromTexture(ChoiceConfig->PrimaryIcon);
+	if (ChoiceConfig->SecondaryIcon)
+	{
+		SecondaryIcon->SetBrushFromTexture(ChoiceConfig->SecondaryIcon);
+	}
+
 	Name->SetText(ChoiceConfig->Name);
 	Description->SetText(ChoiceConfig->GetDescription());
 	Rarity = ChoiceConfig->GetRarity();

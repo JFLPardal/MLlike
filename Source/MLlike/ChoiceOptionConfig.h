@@ -20,7 +20,11 @@ class MLLIKE_API UChoiceOptionConfig : public UPrimaryDataAsset
 public:
 	// TODO make this softPtr
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UTexture2D> Icon;
+	TObjectPtr<UTexture2D> PrimaryIcon;
+
+	// TODO make this softPtr
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UTexture2D> SecondaryIcon;
 
 	UPROPERTY(EditAnywhere)
 	FText Name;
